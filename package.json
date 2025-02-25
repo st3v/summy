@@ -3,6 +3,8 @@
     "version": "1.0.0",
     "description": "Browser extension that summarizes the contents of the current website",
     "scripts": {
-        "build": "wasm-pack build --dev --no-typescript --out-dir 'extension/wasm' --out-name 'summy' --target web"
+        "build-options": "wasm-pack build --release --no-typescript --out-dir '../../extension/wasm' --target web crates/options",
+        "build-background": "wasm-pack build --release --no-typescript --out-dir '../../extension/wasm' --target web crates/background",
+        "build": "npm run build-options && npm run build-background"
     }
 }

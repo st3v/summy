@@ -44,8 +44,6 @@
                 "<all_urls>"
             ],
             "resources": [
-                "wasm/summy.js",
-                "wasm/summy_bg.wasm",
                 "images/button.png"
             ]
         }

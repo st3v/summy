@@ -2,14 +2,9 @@
 <html>
   <head>
     <title>Summy Options</title>
+    <link rel="modulepreload" href="./wasm/summy_options.js" crossorigin="anonymous">
+    <link rel="preload" href="./wasm/summy_options_bg.wasm" crossorigin="anonymous" as="fetch" type="application/wasm">
+    <script type="module" src="options.js"></script>
   </head>
-  <body>
-    <label>
-      <input type="checkbox" id="closeUponSaving" />
-      Close tab after saving
-    </label>
-    <div id="status"></div>
-    <button id="save">Save</button>
-    <script src="options.js"></script>
-  </body>
+  <body></body>
 </html>

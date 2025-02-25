@@ -1,6 +1,6 @@
 // A static import is required in b/g scripts because they are executed in their own env
 // not connected to the content scripts where wasm is loaded automatically
-import initWasmModule, { hello, summarize } from './wasm/summy.js';
+import initWasmModule, { hello, summarize } from './wasm/summy_background.js';
 
 console.log("Background script started");
 
