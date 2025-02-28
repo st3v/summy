@@ -1,130 +1,181 @@
-console.log("☀️☀️☀️ Hello from Summy! ☀️☀️☀️");
+// Load CSS file and create elements
+fetch(chrome.runtime.getURL('content.css'))
+    .then(response => response.text())
+    .then(css => {
+        addButton(document.body, css);
+        addSummary(document.body, css);
+    });
 
-let icon = document.createElement("img");
-icon.src = chrome.runtime.getURL("images/button.png");
-icon.title = "Summarize with Summy";
+function addSummary(root, css) {
+    let container = document.createElement("div");
+    container.id = "summy-summary";
 
-let button = document.createElement("button");
-button.id = "summy-button";
-button.appendChild(icon);
-button.classList.add("no-loading");
-button.onclick = function() {
-    chrome.runtime.sendMessage(
-        { 
-            msg: "summy_capture"
-        }, 
-        function (response) {}
-    );
+    // Create a shadow root to isolate styles
+    const shadow = container.attachShadow({ mode: 'open' });
+
+    const style = document.createElement('style');
+    style.textContent = css;
+    shadow.appendChild(style);
+
+    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+        if (request.msg === "summy_tldr") {
+            let data = JSON.parse(request.result);
+            console.log(data);
+
+            let root = document.createElement("div");
+            root.classList.add("page-tldr");
+
+            addStressScore(root, data.stress_score);
+            addContent(root, data.category, data.summary);
+            addQuestions(root, data.category, data.summary, data.questions, data.answers);
+
+            let emojis = document.createElement("div");
+            emojis.classList.add("page-emojis");
+            emojis.innerText = data.emoji_outline;
+            root.appendChild(emojis);
+
+            shadow.appendChild(root);
+            container.style.display = "block";
+            hideButton();
+        }
+
+        root.appendChild(container);
+    });
 }
 
-let buttonDiv = document.createElement("div");
-buttonDiv.classList.add("button-container");
-buttonDiv.appendChild(button);
-document.body.prepend(buttonDiv);
+function addButton(root, css) {
+    // Create icon element
+    let icon = document.createElement("img");
+    icon.src = chrome.runtime.getURL("images/button.png");
+    icon.title = "Summarize with Summy";
 
-let tldr = document.createElement("div");
-tldr.id = "summy-tldr";
-document.body.prepend(tldr);
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.msg === "summy_tldr") {
-        let data = JSON.parse(request.result);
-        console.log("summy_tldr: ", data);
-
-        // Create stress container first
-        let stress = document.createElement("div");
-        stress.classList.add("stress-container");
-
-        let stressTitle = document.createElement("div");
-        stressTitle.classList.add("stress-title");
-        stressTitle.innerText = "Stress Level";
-        stress.appendChild(stressTitle);
-
-        let stressScore = document.createElement("div");
-        stressScore.classList.add("stress-score");
-        if (data.stress_score < 4) stressScore.innerText = "🙂";
-        else if (data.stress_score < 7) stressScore.innerText = "😐";
-        else stressScore.innerText = "😞";
-        stress.appendChild(stressScore);
-
-        let stressCategory = document.createElement("div");
-        stressCategory.classList.add("stress-category");
-        if (data.stress_score < 4) stressCategory.innerText = "Low";
-        else if (data.stress_score < 7) stressCategory.innerText = "Medium";
-        else stressCategory.innerText = "High";
-        stress.appendChild(stressCategory);
-
-        // Create summary container
-        let summaryContainer = document.createElement("div");
-        summaryContainer.classList.add("summary-container");
-        
-        // Create content view
-        let contentView = document.createElement("div");
-        contentView.classList.add("content-view");
-        
-        // Store summary content for back navigation
-        const summaryContent = {
-            title: data.category,
-            text: data.summary
-        };
-        
-        // Add title and text sections
-        let titleSection = document.createElement("div");
-        titleSection.classList.add("content-title");
-        
-        let textSection = document.createElement("div");
-        textSection.classList.add("content-text");
-        
-        // Set initial content (summary)
-        titleSection.innerText = summaryContent.title;
-        textSection.innerText = summaryContent.text;
-        
-        contentView.appendChild(titleSection);
-        contentView.appendChild(textSection);
-        
-        summaryContainer.appendChild(contentView);
-
-        // Create questions container
-        let questionsContainer = document.createElement("div");
-        questionsContainer.classList.add("questions-container");
-        
-        // Add questions
-        data.questions.forEach((question, index) => {
-            let questionItem = document.createElement("div");
-            questionItem.classList.add("question-item");
-            questionItem.innerHTML = `◂ ${question}`;
-            questionItem.onclick = () => {
-                // Update content to show answer
-                titleSection.innerHTML = `<span class="back-button">◂ Back</span> ${question}`;
-                textSection.innerText = data.answers[index];
-                
-                // Add back button functionality
-                titleSection.querySelector('.back-button').onclick = (e) => {
-                    e.stopPropagation();
-                    // Always go back to summary
-                    titleSection.innerText = summaryContent.title;
-                    textSection.innerText = summaryContent.text;
-                };
-            };
-            questionsContainer.appendChild(questionItem);
-        });
-
-        let pageEmojis = document.createElement("div");
-        pageEmojis.classList.add("page-emojis");
-        pageEmojis.innerText = data.emoji_outline;
-
-        let pageTLDR = document.createElement("div");
-        pageTLDR.classList.add("page-tldr");
-        pageTLDR.appendChild(stress);
-        pageTLDR.appendChild(summaryContainer);
-        pageTLDR.appendChild(questionsContainer);
-        pageTLDR.appendChild(pageEmojis);
-        
-        tldr.innerHTML = "";
-        tldr.appendChild(pageTLDR);
-        tldr.style.display = "flex";
-        buttonDiv.style.display = "none";
-
-        console.log("summy_tldr: Summary: \n" + request.summary);
+    // Create button element
+    let button = document.createElement("button");
+    button.id = "summy-button";
+    button.appendChild(icon);
+    button.classList.add("no-loading");
+    button.onclick = function () {
+        chrome.runtime.sendMessage(
+            {
+                msg: "summy_capture"
+            },
+            function (response) {
+                button.classList.add("loading");
+                button.classList.remove("no-loading");
+            }
+        );
     }
-});
+
+    // Create button container
+    let container = document.createElement("div");
+    container.classList.add("button-container");
+
+    // Create shadow DOM for button to isolate styles
+    const shadow = container.attachShadow({ mode: 'open' });
+    const style = document.createElement('style');
+    style.textContent = css;
+    shadow.appendChild(style);
+    shadow.appendChild(button);
+
+    // Add button to the root
+    root.appendChild(container);
+}
+
+function hideButton() {
+    const container = document.querySelector('.button-container');
+    container.style.display = "none";
+}
+
+// Add stress score view to root
+function addStressScore(root, score) {
+    let container = document.createElement("div");
+    container.classList.add("stress-container");
+
+    let title = document.createElement("div");
+    title.classList.add("stress-title");
+    title.innerText = "Stress Level";
+    container.appendChild(title);
+
+    let emoji = "😞";
+    let level = "High";
+
+    if (score < 4) {
+        emoji = "🙂";
+        level = "Low";
+    } else if (score < 7) {
+        emoji = "😐";
+        level = "Medium";
+    }
+
+    let emojiElem = document.createElement("div");
+    emojiElem.classList.add("stress-score");
+    emojiElem.innerText = emoji;
+    container.appendChild(emojiElem);
+
+    let levelElem = document.createElement("div");
+    levelElem.classList.add("stress-category");
+    levelElem.innerText = level;
+    container.appendChild(levelElem);
+
+    root.appendChild(container);
+}
+
+// Add content view to root
+function addContent(root, category, summary) {
+    let container = document.createElement("div");
+    container.classList.add("summary-container");
+
+    // Create content view
+    let contentView = document.createElement("div");
+    contentView.classList.add("content-view");
+
+    // Add title and text sections
+    let title = document.createElement("div");
+    title.classList.add("content-title");
+
+    let text = document.createElement("div");
+    text.classList.add("content-text");
+
+    // Set initial content (summary)
+    title.innerText = category;
+    text.innerText = summary;
+
+    contentView.appendChild(title);
+    contentView.appendChild(text);
+
+    container.appendChild(contentView);
+
+    root.appendChild(container);
+}
+
+// Add questions view to root
+function addQuestions(root, category, summary, questions, answers) {
+    let container = document.createElement("div");
+    container.classList.add("questions-container");
+
+    // Add questions
+    questions.forEach((question, index) => {
+        let questionElem = document.createElement("div");
+        questionElem.classList.add("question-item");
+        questionElem.innerHTML = `◂ ${question}`;
+        questionElem.onclick = () => {
+            let title = root.querySelector(".content-title");
+            let text = root.querySelector(".content-text");
+
+            // Update content to show answer
+            title.innerHTML = `<span class="back-button">◂ Back</span> ${question}`;
+            text.innerText = answers[index];
+
+            // Add back button functionality
+            title.querySelector('.back-button').onclick = (e) => {
+                e.stopPropagation();
+                // Always go back to category and summary
+                title.innerText = category;
+                text.innerText = summary;
+            };
+        };
+        container.appendChild(questionElem);
+    });
+
+    root.appendChild(container);
+}

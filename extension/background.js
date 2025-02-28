@@ -45,9 +45,6 @@ function displaySummary(tab, summary) {
 }
 
 function DOMtoString() {
-    let btn = document.getElementById("summy-button")
-    btn.classList.add("loading");
-    btn.classList.remove("no-loading");
     return document.documentElement.outerHTML;
 }
 

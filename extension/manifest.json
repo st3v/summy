@@ -45,7 +45,8 @@
                 "<all_urls>"
             ],
             "resources": [
-                "images/button.png"
+                "images/button.png",
+                "content.css"
             ]
         }
     ]
