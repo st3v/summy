@@ -31,24 +31,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         let data = JSON.parse(request.result);
         console.log("summy_tldr: ", data);
 
-        let pageCategory = document.createElement("div");
-        pageCategory.classList.add("page-category");
-        pageCategory.innerText = data.category;
-        
-        let pageSummary = document.createElement("div");
-        pageSummary.classList.add("page-summary");
-        pageSummary.innerText = data.summary;
-
-        let pageEmojis = document.createElement("div");
-        pageEmojis.classList.add("page-emojis");
-        pageEmojis.innerText = data.emoji_outline;
-
-        let pageTLDR = document.createElement("div");
-        pageTLDR.classList.add("page-tldr");
-        pageTLDR.appendChild(pageCategory);
-        pageTLDR.appendChild(pageEmojis);
-        pageTLDR.appendChild(pageSummary);
-        
+        // Create stress container first
         let stress = document.createElement("div");
         stress.classList.add("stress-container");
 
@@ -71,8 +54,73 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         else stressCategory.innerText = "High";
         stress.appendChild(stressCategory);
 
+        // Create summary container
+        let summaryContainer = document.createElement("div");
+        summaryContainer.classList.add("summary-container");
+        
+        // Create content view
+        let contentView = document.createElement("div");
+        contentView.classList.add("content-view");
+        
+        // Store summary content for back navigation
+        const summaryContent = {
+            title: data.category,
+            text: data.summary
+        };
+        
+        // Add title and text sections
+        let titleSection = document.createElement("div");
+        titleSection.classList.add("content-title");
+        
+        let textSection = document.createElement("div");
+        textSection.classList.add("content-text");
+        
+        // Set initial content (summary)
+        titleSection.innerText = summaryContent.title;
+        textSection.innerText = summaryContent.text;
+        
+        contentView.appendChild(titleSection);
+        contentView.appendChild(textSection);
+        
+        summaryContainer.appendChild(contentView);
+
+        // Create questions container
+        let questionsContainer = document.createElement("div");
+        questionsContainer.classList.add("questions-container");
+        
+        // Add questions
+        data.questions.forEach((question, index) => {
+            let questionItem = document.createElement("div");
+            questionItem.classList.add("question-item");
+            questionItem.innerHTML = `◂ ${question}`;
+            questionItem.onclick = () => {
+                // Update content to show answer
+                titleSection.innerHTML = `<span class="back-button">◂ Back</span> ${question}`;
+                textSection.innerText = data.answers[index];
+                
+                // Add back button functionality
+                titleSection.querySelector('.back-button').onclick = (e) => {
+                    e.stopPropagation();
+                    // Always go back to summary
+                    titleSection.innerText = summaryContent.title;
+                    textSection.innerText = summaryContent.text;
+                };
+            };
+            questionsContainer.appendChild(questionItem);
+        });
+
+        let pageEmojis = document.createElement("div");
+        pageEmojis.classList.add("page-emojis");
+        pageEmojis.innerText = data.emoji_outline;
+
+        let pageTLDR = document.createElement("div");
+        pageTLDR.classList.add("page-tldr");
+        pageTLDR.appendChild(stress);
+        pageTLDR.appendChild(summaryContainer);
+        pageTLDR.appendChild(questionsContainer);
+        pageTLDR.appendChild(pageEmojis);
+        
         tldr.innerHTML = "";
-        tldr.appendChild(stress);
         tldr.appendChild(pageTLDR);
         tldr.style.display = "flex";
         buttonDiv.style.display = "none";

@@ -70,7 +70,7 @@
 }
 
 #summy-tldr {
-  border-top: thin solid rgb(210, 223, 210);
+  border-top: thin solid rgba(255, 255, 255, 0.2);
   line-height: 1.6;
   position: fixed;
   bottom: 0;
@@ -88,24 +88,13 @@
   background: linear-gradient(90deg, rgb(45 14 99) 10%, rgb(212, 17, 115) 100%);
 }
 
-.page-category {
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.page-summary {
-  font-size: 14px;
-  margin-top: 5px;
-  flex: 15 1 0;
-}
-
 .page-emojis {
   font-size: 15px;
   padding: 5px 15px;
-  top: -18px;
+  top: -23px;
   right: 0;
   margin-right: 10px;
-  border: thin solid #d2dfd2;
+  border: thin solid rgba(255, 255, 255, 0.2);
   background: rgb(78 17 103);
   border-radius: 25px;
   position: absolute;
@@ -113,18 +102,101 @@
 
 .page-tldr {
   font-size: 14px;
-  padding-left: 20px;
-  padding-right: 10px;
+  padding:8px 10px 5px 0px;
   flex: 15 1 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  min-width: 800px;
+}
+
+.summary-container {
+  flex: 3 1 500px;
+  min-width: 400px;
+  position: relative;
+  margin-left: -10px;
+  height: 120px;
+}
+
+.content-view {
+  padding: 0px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 80px;
+}
+
+.content-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.content-text {
+  line-height: 1.5;
+  font-size: 14px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  width: 100%;
+  word-wrap: break-word;
+  min-height: 120px;
+}
+
+.back-button {
+  cursor: pointer;
+  color: #cccccc;
+  font-size: 12px;
+  margin-right: 15px;
+  transition: color 0.2s;
+}
+
+.back-button:hover {
+  color: white;
+}
+
+.questions-container {
+  width: 300px;
+  flex: 0 0 300px;
+  padding-left: 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  display: none;
+}
+
+/* Show questions container when screen is wide enough */
+@media (min-width: 800px) {
+  .questions-container {
+    display: block;
+  }
+
+  .summary-container {
+    height: 120px;
+  }
+
+  .content-text {
+    min-height: 50px;
+  }
+}
+
+/* Remove previous margin/padding from questions container */
+.questions-container {
+  margin-top: 0;
 }
 
 .stress-container {
   text-align: center;
-  padding-left: 5px;
-  padding-right: 5px;
-  flex: 1 1 0;
+  padding-left: 0px 20px;
+  flex: 0 0 auto;
   font-weight: bold;
-  border-right: 2px solid;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  margin-right: 20px;
+  width: 100px;
+  color: #cccccc;
 }
 
 .stress-title {
@@ -136,7 +208,7 @@
 
 .stress-score {
   font-size: 30px;
-  margin-top: 10px;
+  margin-top: 5px;
   line-height: 1;
   display: block;
 }
@@ -145,12 +217,88 @@
   font-size: 10px;
   line-height: 1;
   display: block;
-  margin-top: 5px;
+  margin-top: 3px;
+  margin-bottom: 2px;
 }
 
 @keyframes loading {
   80%,100% {
     box-shadow: -5px 0, 5px 0, 0 5px, 0 -5px;
     transform: rotate(180deg);
+  }
+}
+
+.question-item {
+  cursor: pointer;
+  color: #cccccc;
+  margin-bottom: 8px;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.question-item:hover {
+  color: white;
+}
+
+/* Style scrollbar */
+.content-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-text::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.content-text::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.content-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 800px) {
+  .questions-container {
+    display: none;
+  }
+  
+  .page-tldr {
+    min-width: auto;
+    padding: 0px;
+  }
+
+  .summary-container {
+    min-height: 100px;
+  }
+
+  .content-title {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+  .content-text {
+    min-height: auto;
+    font-size: 12px;
+  }
+
+  .stress-container {
+    width: 60px;
+    margin-right: 15px;
+    padding: 5px 5px;
+    margin: 0px;
+  }
+
+  .stress-title {
+    font-size: 9px;
+  }
+
+  .stress-score {
+    font-size: 24px;
+  }
+
+  .stress-category {
+    font-size: 9px;
   }
 }
