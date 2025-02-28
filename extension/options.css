@@ -1,0 +1,53 @@
+body {
+  background: linear-gradient(90deg, rgb(31, 0, 122) 0%, rgb(212, 17, 115) 100%);
+}
+
+.options-container {
+  padding: 10px;
+  color: white;
+}
+
+.options-header {
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: solid 1px;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  margin-top: 0px;
+}
+
+.input-group {
+  display: block;
+  margin-top: 15px;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.text-input {
+  font-size: 13px;
+  width: -webkit-fill-available;
+  padding: 5px;
+  background: floralwhite;
+  border: none;
+}
+
+.test-button {
+  width: 100px;
+  margin-top: 20px;
+  padding: 5px;
+  background: lightblue;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.test-response {
+  display: inline;
+  margin-top: 15px;
+} 

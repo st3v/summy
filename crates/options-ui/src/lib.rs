@@ -21,19 +21,19 @@ fn App() -> impl IntoView {
     let (test_response, set_test_response) = signal("".to_string());
 
     view! {
-        <div style="padding: 10px; color: white">
-            <h1 style="font-size: 16px; font-weight: bold; border-bottom: solid 1px; padding-bottom: 15px; margin-bottom: 15px; margin-top: 0px;">"LLM Options"</h1>
-            <div style="display: block; margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">Model:</label>
+        <div class="options-container">
+            <h1 class="options-header">"LLM Options"</h1>
+            <div class="input-group">
+                <label class="input-label">Model:</label>
                 <TextInput option=options.llm_model() id="model".to_string()/>
             </div>
-            <div style="display: block; margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px;">API Key:</label>
+            <div class="input-group">
+                <label class="input-label">API Key:</label>
                 <TextInput option=options.llm_api_key() id="api-key".to_string()/>
             </div>
 
             <button
-                style="width: 100px; margin-top: 20px; padding: 5px; background: lightblue; border: none; font-size: 13px; cursor: pointer; margin-right: 15px;"
+                class="test-button"
                 on:click=move |_| {
                     spawn_local(async move {
                         let response = summy_background::test_llm().await;
@@ -50,7 +50,7 @@ fn App() -> impl IntoView {
             >
                 "Test LLM"
             </button>
-            <div style="display: inline; margin-top: 15px;">
+            <div class="test-response">
                 {test_response}
             </div>
         </div>
@@ -79,7 +79,7 @@ fn TextInput<O: Option<String> + Clone + Send + 'static>(option: O, id: String) 
         >
             <input
                 list={id_input}
-                style="font-size: 13px; width: -webkit-fill-available; padding: 5px; background: floralwhite; border: none;"
+                class="text-input"
                 type="text"
                 value={move || Suspend::new(async move {
                     match model.await {
