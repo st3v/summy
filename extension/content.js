@@ -8,45 +8,66 @@ fetch(chrome.runtime.getURL('content.css'))
 
 function addSummary(root, css) {
     let container = document.createElement("div");
-    container.id = "summy-summary";
+    container.id = "summy-summary-root";
 
     // Create a shadow root to isolate styles
     const shadow = container.attachShadow({ mode: 'open' });
 
     const style = document.createElement('style');
     style.textContent = css;
-    shadow.appendChild(style);
 
     chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
         if (request.msg === "summy_tldr") {
+            // acknowledge the message
+            sendResponse({received: true});
+
+            // parse the result
             let data = JSON.parse(request.result);
-            console.log(data);
 
-            let root = document.createElement("div");
-            root.classList.add("page-tldr");
+            // Remove any existing elements and add the style
+            shadow.innerHTML = "";
+            shadow.appendChild(style);
 
-            addStressScore(root, data.stress_score);
-            addContent(root, data.category, data.summary);
-            addQuestions(root, data.category, data.summary, data.questions, data.answers);
+            let div = document.createElement("div");
+            div.classList.add("page-tldr");
 
-            let emojis = document.createElement("div");
-            emojis.classList.add("page-emojis");
-            emojis.innerText = data.emoji_outline;
-            root.appendChild(emojis);
+            addStressScore(div, data.stress_score, data.emoji_outline);
+            addContent(div, data.category, data.summary, data.emoji_outline);
+            addQuestions(div, data.category, data.summary, data.questions, data.answers);
 
-            shadow.appendChild(root);
-            container.style.display = "block";
-            hideButton();
+            // Create a container for the badges
+            let badges = document.createElement("div");
+            badges.classList.add("badges-container");
+
+            // Add close button
+            let closeButton = document.createElement("div");
+            closeButton.classList.add("close-button");
+            closeButton.innerHTML = "x";
+            closeButton.title = "Close Summary";
+            closeButton.onclick = function() {
+                // container.style.display = "none";
+
+                // Remove everything from the shadow root
+                shadow.innerHTML = "";
+
+                // Show the button
+                showSummyButton();
+            };
+            badges.appendChild(closeButton);
+
+            // Add the badges container to the root
+            div.appendChild(badges);
+            shadow.appendChild(div);
+
+            // Hide Summy button
+            hideSummyButton();
         }
-
-        root.appendChild(container);
-
-        // acknowledge the message
-        sendResponse({received: true});
 
         // return true to keep the message channel open
         return true;
     });
+
+    root.appendChild(container);
 }
 
 function addButton(root, css) {
@@ -59,7 +80,7 @@ function addButton(root, css) {
     let button = document.createElement("button");
     button.id = "summy-button";
     button.appendChild(icon);
-    button.classList.add("no-loading");
+    button.classList.add("not-loading");
     button.onclick = function () {
         chrome.runtime.sendMessage(
             {
@@ -71,14 +92,14 @@ function addButton(root, css) {
                     return;
                 }
                 button.classList.add("loading");
-                button.classList.remove("no-loading");
+                button.classList.remove("not-loading");
             }
         );
     }
 
     // Create button container
     let container = document.createElement("div");
-    container.classList.add("button-container");
+    container.id = "summy-button-root";
 
     // Create shadow DOM for button to isolate styles
     const shadow = container.attachShadow({ mode: 'open' });
@@ -91,9 +112,17 @@ function addButton(root, css) {
     root.appendChild(container);
 }
 
-function hideButton() {
-    const container = document.querySelector('.button-container');
-    container.style.display = "none";
+function hideSummyButton() {
+    const root = document.querySelector('#summy-button-root');
+    root.style.display = "none";
+}
+
+function showSummyButton() {
+    const root = document.querySelector('#summy-button-root');
+    const button = root.shadowRoot.querySelector('#summy-button');
+    button.classList.remove("loading");
+    button.classList.add("not-loading");
+    root.style.display = "block";
 }
 
 // Add stress score view to root
@@ -106,21 +135,21 @@ function addStressScore(root, score) {
     title.innerText = "Stress Level";
     container.appendChild(title);
 
-    let emoji = "😞";
+    let symbol = "😞";
     let level = "High";
 
     if (score < 4) {
-        emoji = "🙂";
+        symbol = "🙂";
         level = "Low";
     } else if (score < 7) {
-        emoji = "😐";
+        symbol = "😐";
         level = "Medium";
     }
 
-    let emojiElem = document.createElement("div");
-    emojiElem.classList.add("stress-score");
-    emojiElem.innerText = emoji;
-    container.appendChild(emojiElem);
+    let symbolElem = document.createElement("div");
+    symbolElem.classList.add("stress-score");
+    symbolElem.innerText = symbol;
+    container.appendChild(symbolElem);
 
     let levelElem = document.createElement("div");
     levelElem.classList.add("stress-category");
@@ -131,7 +160,7 @@ function addStressScore(root, score) {
 }
 
 // Add content view to root
-function addContent(root, category, summary) {
+function addContent(root, category, summary, emojis) {
     let container = document.createElement("div");
     container.classList.add("summary-container");
 
@@ -147,14 +176,13 @@ function addContent(root, category, summary) {
     text.classList.add("content-text");
 
     // Set initial content (summary)
-    title.innerText = category;
+    title.innerHTML = `${category} <span class="inline-emojis">${emojis}</span>`;
     text.innerText = summary;
 
     contentView.appendChild(title);
     contentView.appendChild(text);
 
     container.appendChild(contentView);
-
     root.appendChild(container);
 }
 

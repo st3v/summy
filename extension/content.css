@@ -30,17 +30,17 @@
   left: 0;
 }
 
-.no-loading img {
+.not-loading img {
   position: absolute;
   top: 0;
   left: 0;
 }
 
-.no-loading:hover {
+.not-loading:hover {
   opacity: 1;
 }
 
-.no-loading {
+.not-loading {
   margin: auto;
   width: 40px;
   height: 40px;
@@ -60,7 +60,7 @@
   transition: opacity 1s;
 }
 
-.button-container {
+#summy-button-root {
   position: fixed;
   bottom: 30px;
   right: 30px;
@@ -69,40 +69,51 @@
   width: 40px;
 }
 
-#summy-summary {
-  border-top: thin solid rgba(255, 255, 255, 0.2);
-  line-height: 1.6;
+#summy-summary-root {
   position: fixed;
   bottom: 0;
   right: 0;
   left: 0;
   z-index: 9999997;
-  padding-top: 10px;
-  padding-bottom: 10px;
   width: 100%;
-  color: white;
-  font-size: 14px;
-  text-align: left;
-  font-family: Arial, sans-serif;
-  display: none;
-  background: linear-gradient(90deg, rgb(45 14 99) 10%, rgb(212, 17, 115) 100%);
 }
 
-.page-emojis {
-  font-size: 15px;
-  padding: 5px 15px;
-  top: -23px;
-  right: 0;
-  margin-right: 10px;
-  border: thin solid rgba(255, 255, 255, 0.2);
-  background: rgb(78 17 103);
-  border-radius: 25px;
+.badges-container {
   position: absolute;
+  top: -15px;
+  right: 3px;
+  display: flex;
+  gap: 3px;
+}
+
+.close-button {
+  font-size: 15px;
+  padding: 3px;
+  background: rgb(147, 147, 147);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background: rgb(180, 180, 180);
 }
 
 .page-tldr {
+  border-top: thin solid rgba(255, 255, 255, 0.4);
+  background: linear-gradient(90deg, rgb(45 14 99) 10%, rgb(212, 17, 115) 100%);
+  line-height: 1.6;
+  text-align: left;
+  font-family: Arial, sans-serif;
+  color: white;
   font-size: 14px;
-  padding:8px 10px 5px 0px;
+  padding:10px 10px 5px 0px;
   flex: 15 1 0;
   display: flex;
   flex-wrap: nowrap;
@@ -163,6 +174,7 @@
   width: 300px;
   flex: 0 0 300px;
   padding-left: 20px;
+  padding-top: 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   display: none;
 }
@@ -180,11 +192,6 @@
   .content-text {
     min-height: 50px;
   }
-}
-
-/* Remove previous margin/padding from questions container */
-.questions-container {
-  margin-top: 0;
 }
 
 .stress-container {
@@ -237,6 +244,7 @@
 
 .question-item:hover {
   color: white;
+  font-weight: bold;
 }
 
 /* Style scrollbar */
@@ -300,4 +308,9 @@
   .stress-category {
     font-size: 9px;
   }
+}
+
+.inline-emojis {
+  margin-left: 10px;
+  opacity: 0.9;
 }
