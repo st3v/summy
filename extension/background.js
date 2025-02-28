@@ -13,8 +13,8 @@ console.log("Background script started");
 
 chrome.contextMenus.create({
     id: "summyContextMenuId",
-    title: "Summarize in Summy",
-    contexts:["page"],  // ContextType
+    title: "Summarize with Summy",
+    contexts:["page"],
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) =>
@@ -45,6 +45,9 @@ function displaySummary(tab, summary) {
 }
 
 function DOMtoString() {
+    let btn = document.getElementById("summy-button")
+    btn.classList.add("loading");
+    btn.classList.remove("no-loading");
     return document.documentElement.outerHTML;
 }
 
@@ -57,11 +60,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
         chrome.tabs.query(params, function (tabs) {
             process(tabs[0]);
-            chrome.storage.sync.get(["closeUponSaving"]).then((result) => {
-                if (result.closeUponSaving) {
-                    chrome.tabs.remove(tabs[0].id);
-                }
-            });
         });
     }
 });
