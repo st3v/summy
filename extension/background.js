@@ -48,7 +48,7 @@ function DOMtoString() {
     return document.documentElement.outerHTML;
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     if (request.msg === "summy_capture") {
         let params = {
             currentWindow: true,
@@ -58,5 +58,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         chrome.tabs.query(params, function (tabs) {
             process(tabs[0]);
         });
+
+        // acknowledge the message
+        sendResponse({received: true});
+
+        // If you're doing async work, return true to keep the message channel open
+        return true;
     }
 });

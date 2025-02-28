@@ -17,7 +17,7 @@ function addSummary(root, css) {
     style.textContent = css;
     shadow.appendChild(style);
 
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
         if (request.msg === "summy_tldr") {
             let data = JSON.parse(request.result);
             console.log(data);
@@ -40,6 +40,12 @@ function addSummary(root, css) {
         }
 
         root.appendChild(container);
+
+        // acknowledge the message
+        sendResponse({received: true});
+
+        // return true to keep the message channel open
+        return true;
     });
 }
 
@@ -59,7 +65,11 @@ function addButton(root, css) {
             {
                 msg: "summy_capture"
             },
-            function (response) {
+            function () {
+                if (chrome.runtime.lastError) {
+                    console.log("Summy capture error:", chrome.runtime.lastError.message);
+                    return;
+                }
                 button.classList.add("loading");
                 button.classList.remove("no-loading");
             }

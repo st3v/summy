@@ -143,7 +143,6 @@
   flex: 1;
   overflow-y: auto;
   padding-right: 10px;
-  width: 100%;
   word-wrap: break-word;
   min-height: 120px;
 }
