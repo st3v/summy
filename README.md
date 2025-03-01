@@ -1,6 +1,6 @@
-# Summy - Web Content Summarizer
+# Summy - Web Page Summarizer
 
-Summy is a Chrome extension that uses AI to provide quick, insightful summaries of web pages. It extracts the main content from any webpage and generates a concise summary along with relevant context.
+Summy is a Chrome extension that uses generative AI to provide quick, insightful summaries of web pages. It extracts the main content from any webpage and generates a concise summary along with relevant context.
 
 ## Features
 
@@ -37,9 +37,7 @@ summy/
 │   ├── options.css     # CSS for options page
 │   ├── options.html    # Options page
 │   └── options.js      # JavaScript for options page
-├── crates/             # Rust crates
-│   ├── background/     # WASM module for background processing
-│   └── summy-options/  # Shared options management
+└── src/                # Rust code for WASM module
 ```
 
 ## Architecture
@@ -69,18 +67,18 @@ npm run release  # Production build
    - Click "Load unpacked"
    - Select the `extension` directory
 
-## Usage
-
-1. Click the Summy icon in your browser toolbar or use the context menu
-2. Wait for the AI to process the page content
-3. View the summary with additional insights in the overlay
-
 ## Configuration
 
 Visit the extension options page to:
 - Select your preferred LLM model
 - Configure your API key
 - Test your LLM connection
+
+## Usage
+
+1. Click the Summy icon in your browser toolbar or use the context menu
+2. Wait for the AI to process the page content
+3. View the summary with additional insights in the overlay
 
 ## License
 
