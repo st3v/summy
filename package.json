@@ -4,7 +4,7 @@
     "description": "Browser extension that summarizes the contents of the current website",
     "scripts": {
         "update-manifest": "node scripts/update-manifest.js",
-        "build": "wasm-pack build --no-typescript --out-dir '../../extension/wasm' --target web crates/background",
+        "build": "wasm-pack build --no-typescript --out-dir 'extension/wasm' --target web",
         "dev": "npm run build -- --dev",
         "release": "npm run build -- --release",
         "clean": "rm -rf extension/wasm",

@@ -1,4 +1,5 @@
 import * as backgroundBindings from './wasm/summy_background.js';
+import { MODEL_KEY, API_KEY_KEY, DEFAULT_MODEL } from './constants.js';
 
 // Get the version from manifest.json
 const manifest = chrome.runtime.getManifest();
@@ -9,14 +10,10 @@ await backgroundBindings.default({
   module_or_path: './wasm/summy_background_bg.wasm'
 });
 
-// Storage keys
-const MODEL_KEY = 'llm_model';
-const API_KEY_KEY = 'llm_api_key';
-
 // Load saved options
 async function loadOptions() {
   const result = await chrome.storage.sync.get({
-    [MODEL_KEY]: '',
+    [MODEL_KEY]: DEFAULT_MODEL,
     [API_KEY_KEY]: ''
   });
 
@@ -44,8 +41,12 @@ async function testLLM() {
     // Save current options before testing
     await saveOptions();
 
+    // Get the current values
+    const model = document.getElementById('model').value;
+    const apiKey = document.getElementById('api-key').value;
+
     // Call the test_llm function from the background module
-    const result = await backgroundBindings.test_llm();
+    const result = await backgroundBindings.test_llm(model, apiKey);
     responseElement.textContent = result;
   } catch (error) {
     responseElement.textContent = `Error: ${error.message || error}`;

@@ -1,7 +1,6 @@
 use genai::{adapter::AdapterKind, chat::{ChatMessage, ChatOptions, ChatRequest, ChatResponseFormat, JsonSpec}, resolver::{AuthData, AuthResolver}, Client, ModelIden};
 use wasm_bindgen::prelude::*;
 use dom_content_extraction::{get_content, scraper::Html};
-use summy_options::{Option, StoredOptions};
 use std::sync::LazyLock;
 
 mod util;
@@ -12,26 +11,19 @@ extern "C" {
     fn log(s: &str);
 }
 
-#[wasm_bindgen]
-pub fn hello() {
-    util::set_panic_hook();
-    log("Hello from Summy! ☀️");
-}
-
 fn extract_text(html: &str) -> Result<String, anyhow::Error> {
     let document = Html::parse_document(html);
     get_content(&document).map_err(Into::into)
 }
 
 #[wasm_bindgen]
-pub async fn test_llm() -> Result<String, String> {
+pub async fn test_llm(model: &str, api_key: &str) -> Result<String, String> {
     let request = ChatRequest::new(vec![
         ChatMessage::system("The user wants to test if they can successfuly interact with you. Reply to them in a single sentence confirming that they have access. Do not greet them or address them directly in any other way. Do not mention anything about chatting or talking with them."),
 		ChatMessage::user("Is this working?"),
 	]);
 
-    let model = model().await;
-	let client = Client::builder().with_auth_resolver(auth_resolver().await).build();
+    let client = client(api_key);
 
     match client.exec_chat(&model, request.clone(), None).await {
         Ok(resp) => {
@@ -46,38 +38,31 @@ pub async fn test_llm() -> Result<String, String> {
     }
 }
 
-async fn api_key() -> String {
-    StoredOptions::new().llm_api_key().get().await.unwrap_or_default()
-}
+fn client(api_key: &str) -> Client {
+    let api_key = api_key.to_string();
 
-async fn model() -> String {
-    StoredOptions::new().llm_model().get().await.unwrap_or_default()
-}
+    let auth = AuthResolver::from_resolver_fn(
+        move |_: ModelIden| -> Result<Option<AuthData>, genai::resolver::Error> {
+            Ok(Some(AuthData::from_single(&api_key)))
+        },
+    );
 
-async fn auth_resolver() -> AuthResolver {
-    let api_key = api_key().await;
-
-	AuthResolver::from_resolver_fn(
-		|_: ModelIden| -> Result<core::option::Option<AuthData>, genai::resolver::Error> {
-			Ok(Some(AuthData::from_single(api_key)))
-		},
-	)
+    Client::builder().with_auth_resolver(auth).build()
 }
 
 #[wasm_bindgen]
-pub async fn summarize(html: &str) -> Result<String, String> {
+pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String, String> {
     let text = match extract_text(html) {
         Ok(text) => text,
         Err(e) => return Err(format!("Error extracting text: {}", e)),
     };
 
     let request = ChatRequest::new(vec![
-		ChatMessage::system(SUMMARIZE_SYSTEM_PROMPT),
-		ChatMessage::user(text),
+    	ChatMessage::system(SUMMARIZE_SYSTEM_PROMPT),
+    	ChatMessage::user(text),
 	]);
 
-    let model = model().await;
-	let client = Client::builder().with_auth_resolver(auth_resolver().await).build();
+    let client = client(api_key);
     let options = summarize_chat_options(&client, &model);
     let response = client.exec_chat(&model, request.clone(), Some(&options)).await;
 
@@ -161,7 +146,8 @@ const SUMMARIZE_SYSTEM_PROMPT: &str = r#"
     Next, be creative and come up with an emoji outline that best represents
     the text. You can use any emoji like for example 🤝 🧑 💻 🤖 🤷‍♂️. Try your
     best and suggest an outline of as many as 5 emojis and combine them into a
-    single string separated by spaces.
+    single string separated by spaces. Important: Do not use any letters or
+    numbers in your outline! Also, do not use duplicate emojis!
 
     Last but not least, categorize the text in 1-3 words. If the text contains
     multiple topics, choose the most important one.
@@ -259,7 +245,7 @@ mod tests {
             </html>
         "#;
 
-        let result = summarize(html).await;
+        let result = summarize(html, "model", "api_key").await;
         assert!(result.is_ok());
         let result = result.unwrap();
         assert!(!result.is_empty());

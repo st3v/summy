@@ -1,6 +1,7 @@
 // A static import is required in b/g scripts because they are executed in their own env
 // not connected to the content scripts where wasm is loaded automatically
-import initWasmModule, { hello, summarize } from './wasm/summy_background.js';
+import initWasmModule, { summarize } from './wasm/summy_background.js';
+import { MODEL_KEY, API_KEY_KEY, DEFAULT_MODEL } from './constants.js';
 
 console.log("Background script started");
 
@@ -21,16 +22,22 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
 );
 
 function process(tab){
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: DOMtoString,
-    }).then(function (results) {
-        summarize(results[0].result).then(function (summary) {
-            console.log("summarize: Summary: \n" + summary);
-            displaySummary(tab, summary);
-        })
-    }).catch(function (error) {
-        console.log("summarize: Error injecting script: \n" + error.message);
+    // Get the model and API key from storage
+    chrome.storage.sync.get({[MODEL_KEY]: DEFAULT_MODEL, [API_KEY_KEY]: ''}, function(items) {
+        const model = items[MODEL_KEY];
+        const apiKey = items[API_KEY_KEY];
+
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: DOMtoString,
+        }).then(function (results) {
+            summarize(results[0].result, model, apiKey).then(function (summary) {
+                console.log("summarize: Summary: \n" + summary);
+                displaySummary(tab, summary);
+            })
+        }).catch(function (error) {
+            console.log("summarize: Error injecting script: \n" + error.message);
+        });
     });
 };
 
