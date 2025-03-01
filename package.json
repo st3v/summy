@@ -7,6 +7,7 @@
         "build": "wasm-pack build --no-typescript --out-dir '../../extension/wasm' --target web crates/background",
         "dev": "npm run build -- --dev",
         "release": "npm run build -- --release",
+        "clean": "rm -rf extension/wasm",
         "publish": "npm run build release && npm run update-manifest"
     }
 }
