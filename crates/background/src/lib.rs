@@ -37,11 +37,7 @@ pub async fn test_llm() -> Result<String, String> {
         Ok(resp) => {
             match resp.content_text_as_str() {
                 Some(text) => {
-                    // Remove any <think>...</think> prefix if present
-                    let clean_text = regex::Regex::new(r"(?s)^<think>.*?</think>\s*")
-                        .map(|re| re.replace(text, "").to_string())
-                        .unwrap_or_else(|_| text.to_string());
-                    Ok(clean_text.trim().to_string())
+                    Ok(text.to_string())
                 },
                 _ => Err("No answer".to_string()),
             }

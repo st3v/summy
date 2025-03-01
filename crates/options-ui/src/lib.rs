@@ -6,6 +6,9 @@ use summy_options::{StoredOptions, Option};
 extern "C" {
     #[wasm_bindgen(js_namespace=console)]
     fn log(s: &str);
+
+    #[wasm_bindgen(js_namespace=summy_background, catch)]
+    async fn test_llm() -> Result<JsValue, JsValue>;
 }
 
 #[wasm_bindgen(start)]
@@ -36,9 +39,9 @@ fn App() -> impl IntoView {
                 class="test-button"
                 on:click=move |_| {
                     spawn_local(async move {
-                        let response = summy_background::test_llm().await;
-                        match response {
-                            Ok(response) => {
+                        match test_llm().await {
+                            Ok(js_value) => {
+                                let response = js_value.as_string().unwrap_or_default();
                                 set_test_response.set(response);
                             },
                             Err(e) => {

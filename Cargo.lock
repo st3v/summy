@@ -2791,11 +2791,12 @@ name = "summy-options-ui"
 version = "0.0.1"
 dependencies = [
  "console_error_panic_hook",
+ "js-sys",
  "leptos",
  "reactive_stores",
- "summy-background",
  "summy-options",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]
