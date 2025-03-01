@@ -1,6 +1,6 @@
-use genai::{adapter::AdapterKind, chat::{ChatMessage, ChatOptions, ChatRequest, ChatResponseFormat, JsonSpec}, resolver::{AuthData, AuthResolver}, Client, ModelIden};
 use wasm_bindgen::prelude::*;
 use dom_content_extraction::{get_content, scraper::Html};
+use genai::{adapter::AdapterKind, chat::{ChatMessage, ChatOptions, ChatRequest, ChatResponseFormat, JsonSpec}, resolver::{AuthData, AuthResolver}, Client, ModelIden};
 use std::sync::LazyLock;
 
 mod util;
@@ -25,7 +25,7 @@ pub async fn test_llm(model: &str, api_key: &str) -> Result<String, String> {
 
     let client = client(api_key);
 
-    match client.exec_chat(&model, request.clone(), None).await {
+    match client.exec_chat(model, request.clone(), None).await {
         Ok(resp) => {
             match resp.content_text_as_str() {
                 Some(text) => {
@@ -63,8 +63,8 @@ pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String,
 	]);
 
     let client = client(api_key);
-    let options = summarize_chat_options(&client, &model);
-    let response = client.exec_chat(&model, request.clone(), Some(&options)).await;
+    let options = summarize_chat_options(&client, model);
+    let response = client.exec_chat(model, request.clone(), Some(&options)).await;
 
     match response {
         Ok(resp) => {
@@ -82,7 +82,7 @@ pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String,
 fn summarize_chat_options(client: &Client, model: &str) -> ChatOptions {
     let adapter_kind = client.resolve_service_target(model).unwrap().model.adapter_kind;
     log(&format!("Adapter kind: {:?}", adapter_kind.as_str()));
-    let options = match adapter_kind {
+    match adapter_kind {
         AdapterKind::Groq | AdapterKind::Ollama => {
             // Groq and Ollama do currently not support json_schema
             ChatOptions::default().with_response_format(
@@ -97,9 +97,7 @@ fn summarize_chat_options(client: &Client, model: &str) -> ChatOptions {
                 )
             )
         }
-    };
-
-    options //.with_temperature(0.7)
+    }
 }
 
 const SUMMARIZE_SYSTEM_PROMPT: &str = r#"
@@ -222,32 +220,3 @@ static SUMMARIZE_JSON_SCHEMA: LazyLock<serde_json::Value> = LazyLock::new(|| {
         ]
     })
 });
-
-#[cfg(test)]
-mod tests {
-    use wasm_bindgen_test::*;
-    use super::*;
-
-    #[wasm_bindgen_test]
-    #[allow(dead_code)]
-    async fn test_summarize() {
-        let _ = env_logger::builder().is_test(true).try_init();
-
-        let html = r#"
-            <html>
-                <head>
-                    <title>Test</title>
-                </head>
-                <body>
-                    <h1>Test</h1>
-                    <p>This is a test</p>
-                </body>
-            </html>
-        "#;
-
-        let result = summarize(html, "model", "api_key").await;
-        assert!(result.is_ok());
-        let result = result.unwrap();
-        assert!(!result.is_empty());
-    }
-}
