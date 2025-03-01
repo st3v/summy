@@ -111,7 +111,7 @@ fn summarize_chat_options(client: &Client, model: &str) -> ChatOptions {
         _ => {
             ChatOptions::default().with_response_format(
                 JsonSpec::new(
-                    "response", 
+                    "response",
                     (*SUMMARIZE_JSON_SCHEMA).clone()
                 )
             )
@@ -122,52 +122,57 @@ fn summarize_chat_options(client: &Client, model: &str) -> ChatOptions {
 }
 
 const SUMMARIZE_SYSTEM_PROMPT: &str = r#"
-    Everything you are given is text extracted from an arbitrary website. 
-    Your job is to summarize this text in 1-3 sentences. Your summary must 
+    Everything you are given is text extracted from an arbitrary website.
+    Your job is to summarize this text in 1-3 sentences. Your summary must
     be as concise as possible and must not use unneccessary filler words.
 
     The text might contain HTML tags, CSS styles, Javascript code, or any
-    other content that is not essential and does not add to the topic covered 
-    in the text. You should ignore all of this as noise and focus only on 
+    other content that is not essential and does not add to the topic covered
+    in the text. You should ignore all of this as noise and focus only on
     the essence of the given text.
-    
+
     Do not use terms like "website", "webpage", "page", "doc", "text",
-    or any similar term referring to the document you are given. Instead, 
+    or any similar term referring to the document you are given. Instead,
     only focus on the actual contents and describe those.
-    
+
     Sometimes the text may contain multiple ideas or topics. In those cases,
-    focus on the most important theme. 
-    
-    Do not include information about the source of the text or the website 
-    it was extracted from. In particular, do not include any advertising, 
-    promotional content, or any information informing about cookies, 
+    focus on the most important theme.
+
+    Do not include information about the source of the text or the website
+    it was extracted from. In particular, do not include any advertising,
+    promotional content, or any information informing about cookies,
     privacy policies, or terms of service.
 
-    In addition to your summary, you are tasked with proposing 3 interesting 
-    follow-up questions a user might ask about the text after reading your 
-    summary. Also provide an answer for each of your questions.
+    In addition to your summary, you are tasked with proposing 3 interesting
+    and insightful follow-up questions a user might ask about the text after
+    reading your summary. Also provide an answer for each of your questions.
+    Make sure your answers are concise but not too short either, they should
+    be 2-3 sentences each.
 
-    You are also tasked with assigning what is called a "stress score" to the given text. 
-    The range is from 0 to 9. A score of 0 means the text will most likely cause no stress 
-    to the average user, it might even make the user happy. A text with a score of 9 does 
-    the opposite, it causes the user tremendous stress and unhappiness.
+    You are also tasked with assigning what is called a "stress score" to the
+    given text. The range is from 0 to 9. A score of 0 means the text will most
+    likely cause no stress to the average user, it might even make the user
+    happy. A text with a score of 9 does the opposite, it causes the user
+    tremendous stress and unhappiness.
 
-    Next, you need to assign a "trust score" to the text representing how much you trust 
-    its accuracy. The range is 0-9. A trust score of 0 means the text contains information 
-    that is most definitely not factual and clearly false. A score of 9, on the other hand, 
-    means that the text contains only factual and verified information. You can use the 
-    search tool to verify the information given in the text.
+    Next, you need to assign a "trust score" to the text representing how much
+    you trust its accuracy. The range is 0-9. A trust score of 0 means the text
+    contains information that is most definitely not factual and clearly false.
+    A score of 9, on the other hand, means that the text contains only factual
+    and verified information. You can use the search tool to verify the
+    information given in the text.
 
-    Next, be creative and come up with an emoji outline that best represents the text.
-    You can use any emoji like for example 🦃, 🎂, 🎉, 🤷‍♂️. Try your best and suggest an
-    outline of as many as 5 emojis and combine them into a single string separated by spaces.
+    Next, be creative and come up with an emoji outline that best represents
+    the text. You can use any emoji like for example 🤝 🧑 💻 🤖 🤷‍♂️. Try your
+    best and suggest an outline of as many as 5 emojis and combine them into a
+    single string separated by spaces.
 
-    Last but not least, categorize the text in 1-3 words. If the text contains multiple
-    topics, choose the most important one.
+    Last but not least, categorize the text in 1-3 words. If the text contains
+    multiple topics, choose the most important one.
 
-    IMPORTANT: Make sure to use the same language for your summary, category, questions, 
-    and answers as the primary language of the text you are given!
-    
+    IMPORTANT: Make sure to use the same language for your summary, category,
+    questions, and answers as the primary language of the text you are given!
+
     Only respond with valid JSON using the following format:
 
     {
@@ -185,7 +190,7 @@ const SUMMARIZE_SYSTEM_PROMPT: &str = r#"
         ],
         "stress_score": <your stress score here>,
         "trust_score": <your trust score here>,
-        "emoji_outline": "🤝 🦃 🎂 🎉 🤷‍♂️"
+        "emoji_outline": "🤝 🧑 💻 🤖 🤷‍♂️"
     }
 "#;
 
