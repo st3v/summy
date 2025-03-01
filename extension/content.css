@@ -1,3 +1,28 @@
+#summy-button-root,
+#summy-summary-root {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --summy-primary: #5747d1;
+  --summy-secondary: #a29bfe;
+  --summy-accent: #ce4777;
+  --summy-dark: #2d3436;
+  --summy-light: #f5f6fa;
+  --summy-shadow: rgba(0, 0, 0, 0.1);
+  --summy-radius: 12px;
+  --summy-transition: all 0.3s ease;
+  --summy-button-color: #794fcd;
+}
+
+/* Button styling */
+#summy-button-root {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999998;
+  height: 40px;
+  width: 40px;
+}
+
+/* Original button styling */
 .loading {
   position: relative;
   border: 0px;
@@ -16,11 +41,15 @@
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  color: #794fcd;
+  color: var(--summy-button-color);
   background: currentColor;
   filter: blur(5px);
   box-shadow: -20px 0, 20px 0, 0 20px, 0 -20px;
   animation: loading 1s infinite alternate;
+}
+
+.loading img {
+  opacity: 0;
 }
 
 #summy-button img {
@@ -32,8 +61,8 @@
 
 .not-loading:hover {
   opacity: 1;
-  box-shadow: 0 0 50px 0 rgba(128, 34, 179, 0.9);
-  filter: drop-shadow(0 0 10px rgba(121, 79, 205, 0.8));
+  box-shadow: 0 0 50px 0 var(--summy-button-color);
+  filter: drop-shadow(0 0 10px var(--summy-button-color));
 }
 
 .not-loading {
@@ -57,182 +86,18 @@
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  color: #794fcd;
+  color: var(--summy-button-color);
   background: currentColor;
   filter: blur(5px);
 }
 
 #summy-button {
-  transition: opacity 1s;
+  background: none;
+  transition: var(--summy-transition);
 }
 
 #summy-button img {
-  transition: opacity 1s;
-}
-
-#summy-button-root {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 9999998;
-  height: 40px;
-  width: 40px;
-}
-
-#summy-summary-root {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  z-index: 9999997;
-  width: 100%;
-}
-
-.badges-container {
-  position: absolute;
-  top: -12px;
-  right: 5px;
-  display: flex;
-  gap: 3px;
-}
-
-.close-button {
-  font-size: 15px;
-  padding: 2px;
-  background: rgb(147, 147, 147);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.close-button:hover {
-  background: rgb(180, 180, 180);
-}
-
-.page-tldr {
-  border-top: thin solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(90deg, rgb(45 14 99) 30%, rgb(212, 17, 115) 150%);
-  line-height: 1.6;
-  text-align: left;
-  font-family: Arial, sans-serif;
-  color: white;
-  font-size: 14px;
-  padding:15px 10px 5px 0px;
-  flex: 15 1 0;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 20px;
-  min-width: 800px;
-}
-
-.summary-container {
-  flex: 3 1 300px;
-  min-width: 300px;
-  position: relative;
-  margin-left: -10px;
-  height: 100%;
-  min-height: 100px;
-}
-
-.content-view {
-  padding: 0px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: auto;
-}
-
-.content-title {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 5px;
-  display: flex;
-  flex: 0 0 auto;
-  width: 100%;
-}
-
-.title-text {
-  flex: 1;
-  margin-right: 10px;
-}
-
-.title-emojis {
-  font-size: 18px;
-  white-space: nowrap;
-}
-
-.content-text {
-  line-height: 1.5;
-  font-size: 14px;
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 10px;
-  word-wrap: break-word;
-  min-height: auto;
-  height: 100%;
-}
-
-.back-button {
-  margin-top: 3px;
-  cursor: pointer;
-  color: #cccccc;
-  font-size: 12px;
-  transition: color 0.2s;
-}
-
-.back-button:hover {
-  color: white;
-}
-
-.questions-container {
-  width: 200px;
-  flex: 2 1 200px;
-  padding-left: 20px;
-  padding-top: 3px;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  display: none;
-}
-
-/* Show questions container when screen is wide enough */
-@media (min-width: 800px) {
-  .questions-container {
-    display: block;
-  }
-}
-
-.stress-container {
-  text-align: center;
-  flex: 0 0 80px;
-  font-weight: bold;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  margin-right: 20px;
-  width: 100px;
-  color: #cccccc;
-}
-
-.stress-title {
-  font-size: 10px;
-  display: block;
-  line-height: 1;
-  margin-top: 8px;
-}
-
-.stress-score {
-  font-size: 40px;
-  display: block;
-}
-
-.stress-category {
-  font-size: 10px;
-  line-height: 1;
-  display: block;
+  transition: var(--summy-transition);
 }
 
 @keyframes loading {
@@ -242,82 +107,276 @@
   }
 }
 
-.question-item {
-  cursor: pointer;
-  color: #cccccc;
-  margin-bottom: 8px;
+/* Summary container */
+#summy-summary-root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999997;
+}
+
+.page-tldr {
+  background: linear-gradient(135deg, var(--summy-primary), var(--summy-accent));
+  color: white;
+  box-shadow: 0 -4px 20px var(--summy-shadow);
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 20px;
+  gap: 24px;
+  max-height: 40vh;
+  overflow: hidden;
+  position: relative;
+  border-top-left-radius: var(--summy-radius);
+  border-top-right-radius: var(--summy-radius);
+}
+
+/* Stress score section */
+.stress-container {
+  flex: 0 0 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--summy-radius);
+  backdrop-filter: blur(4px);
+}
+
+.stress-title {
   font-size: 12px;
-  transition: color 0.2s;
+  font-weight: 500;
+  opacity: 0.8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stress-score {
+  font-size: 42px;
+  line-height: 1;
+  margin: 8px 0;
+}
+
+.stress-category {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Summary content */
+.summary-container {
+  flex: 4;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+.content-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.title-text {
+  font-size: 18px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.title-emojis {
+  font-size: 20px;
+  margin-left: 12px;
+  white-space: nowrap;
+  letter-spacing: 2px;
+}
+
+.content-text {
+  flex: 1;
+  overflow-y: auto;
+  line-height: 1.6;
+  font-size: 15px;
+  padding-right: 12px;
+}
+
+/* Questions section */
+.questions-container {
+  flex: 1 0 200px;
+  padding-left: 24px;
+  padding-right: 5px;
+  margin-right: 24px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  overflow-y: auto;
+}
+
+.question-item {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--summy-radius);
+  cursor: pointer;
+  transition: var(--summy-transition);
+  font-size: 13px;
 }
 
 .question-item:hover {
-  color: white;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Style scrollbar */
-.content-text::-webkit-scrollbar {
+.back-button {
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: var(--summy-transition);
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Close button */
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--summy-transition);
+  font-size: 16px;
+  z-index: 10;
+  opacity: 0.5;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  /* transform: rotate(-90deg); */
+  opacity: 0.9;
+}
+
+/* Scrollbar styling */
+.content-text::-webkit-scrollbar,
+.questions-container::-webkit-scrollbar {
   width: 6px;
 }
 
-.content-text::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+.content-text::-webkit-scrollbar-track,
+.questions-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 3px;
 }
 
-.content-text::-webkit-scrollbar-thumb {
+.content-text::-webkit-scrollbar-thumb,
+.questions-container::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
 }
 
-.content-text::-webkit-scrollbar-thumb:hover {
+.content-text::-webkit-scrollbar-thumb:hover,
+.questions-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
-@media (max-width: 800px) {
+/* Responsive adjustments */
+@media (max-width: 900px) {
   .questions-container {
     display: none;
   }
 
   .page-tldr {
-    min-width: auto;
-  }
-
-  .summary-container {
-    min-height: 100px;
-  }
-
-  .content-title {
-    font-size: 13px;
-    margin-bottom: 5px;
-  }
-
-  .title-emojis {
-    font-size: 13px;
-  }
-
-  .content-text {
-    min-height: auto;
-    font-size: 12px;
+    padding: 16px;
   }
 
   .stress-container {
-    width: 60px;
-    margin-right: 15px;
-    padding: 5px 5px;
-    margin: 0px;
-  }
-
-  .stress-title {
-    font-size: 9px;
-    padding: 0px;
-    margin: 0px;
+    flex: 0 0 80px;
+    padding: 8px;
+    text-align: center;
+    justify-content: center;
   }
 
   .stress-score {
-    font-size: 30px;
+    font-size: 32px;
   }
 
-  .stress-category {
-    font-size: 9px;
+  .title-text {
+    font-size: 16px;
+  }
+
+  .content-text {
+    font-size: 14px;
+    padding-right: 30px;
+  }
+
+  .title-emojis {
+    margin-right: 25px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-tldr {
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px;
+    max-height: 60vh;
+  }
+
+  .stress-container {
+    flex: 0 0 auto;
+    flex-direction: row;
+    width: 100%;
+    gap: 8px;
+    box-sizing: border-box;
+    padding: 8px 0px 0px 0px;
+    background: none;
+    justify-content: left;
+  }
+
+  .stress-title {
+    margin-bottom: 0;
+    margin-right: 8px;
+  }
+
+  .stress-score {
+    font-size: 25px;
+    margin: 0px;
+  }
+
+  .summary-container {
+    padding-top: 8px;
+  }
+
+  .title-emojis {
+    margin-right: 0px;
+  }
+
+  .content-view {
+    padding-top: 5px;
+  }
+
+  .content-text {
+    padding-right: 0px;
   }
 }

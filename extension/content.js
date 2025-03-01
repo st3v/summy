@@ -35,28 +35,20 @@ function addSummary(root, css) {
             addContent(div, data.category, data.summary, data.emoji_outline);
             addQuestions(div, data.questions, data.answers);
 
-            // Create a container for the badges
-            let badges = document.createElement("div");
-            badges.classList.add("badges-container");
-
             // Add close button
             let closeButton = document.createElement("div");
             closeButton.classList.add("close-button");
-            closeButton.innerHTML = "x";
+            closeButton.innerHTML = "×";
             closeButton.title = "Close Summary";
             closeButton.onclick = function() {
-                // container.style.display = "none";
-
                 // Remove everything from the shadow root
                 shadow.innerHTML = "";
 
                 // Show the button
                 showSummyButton();
             };
-            badges.appendChild(closeButton);
+            div.appendChild(closeButton);
 
-            // Add the badges container to the root
-            div.appendChild(badges);
             shadow.appendChild(div);
 
             // Hide Summy button
@@ -135,14 +127,14 @@ function addStressScore(root, score) {
     title.innerText = "Stress Level";
     container.appendChild(title);
 
-    let symbol = "⛈️";
+    let symbol = "😓";
     let level = "High";
 
     if (score < 4) {
-        symbol = "☀️";
+        symbol = "😊";
         level = "Low";
     } else if (score < 7) {
-        symbol = "🌤️";
+        symbol = "😐";
         level = "Medium";
     }
 
@@ -208,7 +200,7 @@ function addQuestions(root, questions, answers) {
     questions.forEach((question, index) => {
         let questionElem = document.createElement("div");
         questionElem.classList.add("question-item");
-        questionElem.innerHTML = `◂ ${question}`;
+        questionElem.innerHTML = question;
         questionElem.onclick = () => {
             let title = root.querySelector(".content-title");
             let text = root.querySelector(".content-text");
@@ -229,7 +221,7 @@ function addQuestions(root, questions, answers) {
 
             let backButton = document.createElement("span");
             backButton.classList.add("back-button");
-            backButton.textContent = "▸ Back";
+            backButton.textContent = "Back to Summary";
             backButton.onclick = (e) => {
                 e.stopPropagation();
                 // Always go back to the original content
