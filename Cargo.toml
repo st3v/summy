@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "crates/summy-options",
-    "crates/options-ui",
     "crates/background"
 ]
 resolver = "2"

@@ -1,53 +1,181 @@
 body {
   background: linear-gradient(90deg, rgb(31, 0, 122) 0%, rgb(212, 17, 115) 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .options-container {
-  padding: 10px;
-  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 30px;
+  width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .options-header {
-  font-size: 16px;
-  font-weight: bold;
-  border-bottom: solid 1px;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 25px;
   padding-bottom: 15px;
-  margin-bottom: 15px;
-  margin-top: 0px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  text-align: center;
 }
 
 .input-group {
-  display: block;
-  margin-top: 15px;
+  margin-bottom: 20px;
 }
 
 .input-label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  font-size: 13px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .text-input {
-  font-size: 13px;
-  width: -webkit-fill-available;
-  padding: 5px;
-  background: floralwhite;
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.text-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Password input styling */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
   border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.toggle-password:focus {
+  outline: none;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Hide the closed eye by default */
+.eye-closed {
+  display: none;
+}
+
+/* When password is visible, show closed eye and hide open eye */
+.password-visible .eye-open {
+  display: none;
+}
+
+.password-visible .eye-closed {
+  display: block;
 }
 
 .test-button {
-  width: 100px;
-  margin-top: 20px;
-  padding: 5px;
-  background: lightblue;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3));
+  color: white;
   border: none;
-  font-size: 13px;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  margin-right: 15px;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.test-button:hover {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.4));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.test-button:active {
+  transform: translateY(0);
 }
 
 .test-response {
-  display: inline;
-  margin-top: 15px;
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.2);
+  min-height: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* Add a subtle animation for the test response */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.test-response:not(:empty) {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Add a logo/icon section */
+.logo-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.version {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  margin-top: 20px;
 }

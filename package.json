@@ -3,11 +3,10 @@
     "version": "0.0.1",
     "description": "Browser extension that summarizes the contents of the current website",
     "scripts": {
-        "dev-options": "wasm-pack build --dev --no-typescript --out-dir '../../extension/wasm' --target web crates/options-ui",
-        "dev-background": "wasm-pack build --dev --no-typescript --out-dir '../../extension/wasm' --target web crates/background",
-        "dev": "npm run dev-options && npm run dev-background",
-        "release-options": "wasm-pack build --release --no-typescript --out-dir '../../extension/wasm' --target web crates/options-ui",
-        "release-background": "wasm-pack build --release --no-typescript --out-dir '../../extension/wasm' --target web crates/background",
-        "release": "npm run release-options && npm run release-background"
+        "update-manifest": "node scripts/update-manifest.js",
+        "build": "wasm-pack build --no-typescript --out-dir '../../extension/wasm' --target web crates/background",
+        "dev": "npm run build -- --dev",
+        "release": "npm run build -- --release",
+        "publish": "npm run build release && npm run update-manifest"
     }
 }
