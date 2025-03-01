@@ -35,9 +35,7 @@
         "tabs",
         "contextMenus",
         "scripting",
-        "storage",
-        "http://*/*", 
-        "https://*/*"
+        "storage"
     ],
     "web_accessible_resources": [
         {
