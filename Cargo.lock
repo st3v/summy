@@ -639,7 +639,8 @@ dependencies = [
 
 [[package]]
 name = "genai"
-version = "0.1.23-WIP"
+version = "0.1.24-WIP"
+source = "git+https://github.com/st3v/rust-genai.git?branch=wasm-target#ecb5dec916a2878413a68f14922a2e52f45a7d06"
 dependencies = [
  "bytes",
  "derive_more 2.0.1",

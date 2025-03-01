@@ -13,7 +13,7 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 dom-content-extraction = "0.3.9"
 anyhow = "1.0.86"
 url = "2.4"
-genai = { version = "0.1.23-WIP", path = "/Users/st3v/workspace/rust-genai" }
+genai = { git = "https://github.com/st3v/rust-genai.git", branch = "wasm-target" }
 serde_json = "1"
 regex = "1.11"
 
