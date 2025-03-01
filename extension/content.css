@@ -123,7 +123,7 @@
   font-family: Arial, sans-serif;
   color: white;
   font-size: 14px;
-  padding:10px 10px 5px 0px;
+  padding:15px 10px 5px 0px;
   flex: 15 1 0;
   display: flex;
   flex-wrap: nowrap;
@@ -153,7 +153,6 @@
   font-size: 16px;
   margin-bottom: 5px;
   display: flex;
-  align-items: center;
   flex: 0 0 auto;
   width: 100%;
 }
@@ -166,7 +165,6 @@
 .title-emojis {
   font-size: 18px;
   white-space: nowrap;
-
 }
 
 .content-text {
@@ -180,6 +178,7 @@
 }
 
 .back-button {
+  margin-top: 3px;
   cursor: pointer;
   color: #cccccc;
   font-size: 12px;
@@ -194,7 +193,7 @@
   width: 300px;
   flex: 0 0 300px;
   padding-left: 20px;
-  padding-top: 10px;
+  padding-top: 3px;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   display: none;
 }
@@ -208,15 +207,10 @@
   .summary-container {
     height: 120px;
   }
-
-  .content-text {
-    min-height: 50px;
-  }
 }
 
 .stress-container {
   text-align: center;
-  padding-left: 0px 20px;
   flex: 0 0 auto;
   font-weight: bold;
   border-right: 1px solid rgba(255, 255, 255, 0.2);
@@ -233,7 +227,7 @@
 }
 
 .stress-score {
-  font-size: 30px;
+  font-size: 40px;
   display: block;
 }
 
@@ -299,10 +293,6 @@
     margin-bottom: 5px;
   }
 
-  .title-text {
-    flex: none;
-  }
-
   .title-emojis {
     font-size: 13px;
   }
@@ -321,10 +311,12 @@
 
   .stress-title {
     font-size: 9px;
+    padding: 0px;
+    margin: 0px;
   }
 
   .stress-score {
-    font-size: 24px;
+    font-size: 30px;
   }
 
   .stress-category {

@@ -135,14 +135,14 @@ function addStressScore(root, score) {
     title.innerText = "Stress Level";
     container.appendChild(title);
 
-    let symbol = "😞";
+    let symbol = "⛈️";
     let level = "High";
 
     if (score < 4) {
-        symbol = "🙂";
+        symbol = "☀️";
         level = "Low";
     } else if (score < 7) {
-        symbol = "😐";
+        symbol = "🌤️";
         level = "Medium";
     }
 
