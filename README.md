@@ -14,7 +14,7 @@ Summy is a Chrome extension that uses AI to provide quick, insightful summaries 
 ## Technical Stack
 
 - **Frontend**: Chrome Extension (HTML, CSS, JavaScript)
-- **WebAssembly Module**: Rust (executed within the browser)
+- **WebAssembly Module**: Rust compiled to WebAssembly (executed within the browser)
 - **AI Integration**: Multiple LLM support including:
   - Google Gemini
   - Anthropic Claude
@@ -28,22 +28,32 @@ Summy is a Chrome extension that uses AI to provide quick, insightful summaries 
 
 ```
 summy/
-├── extension/           # Chrome extension files
+├── extension/          # Chrome extension files
+│   ├── background.js   # Background script for service worker
+│   ├── content.css     # CSS for content script
 │   ├── content.js      # Content script for webpage interaction
-│   ├── background.js   # Background script for extension
+│   ├── images          # Extension icons
+│   ├── manifest.json   # Extension configuration
+│   ├── options.css     # CSS for options page
 │   ├── options.html    # Options page
-│   └── manifest.json   # Extension configuration
+│   └── options.js      # JavaScript for options page
 ├── crates/             # Rust crates
 │   ├── background/     # WASM module for background processing
-│   ├── options-ui/     # Options page UI logic
 │   └── summy-options/  # Shared options management
 ```
+
+## Architecture
+
+Summy uses a hybrid architecture:
+
+- **WASM Module**: Rust code compiled to WebAssembly handles the core summarization logic and interaction with LLMs
+- **Options Page**: JavaScript directly interacting with the WASM module
+- **Content Script**: JavaScript interacting with the WASM module via a service worker
 
 ## Development
 
 1. Install dependencies:
 ```bash
-npm install
 cargo build
 ```
 
@@ -70,7 +80,7 @@ npm run release  # Production build
 Visit the extension options page to:
 - Select your preferred LLM model
 - Configure your API key
-- Customize other settings
+- Test your LLM connection
 
 ## License
 
