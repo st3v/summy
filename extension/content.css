@@ -1,10 +1,10 @@
 .loading {
-  height: 40px;
-  width: 40px;
+  position: relative;
   border: 0px;
   aspect-ratio: 1;
   box-sizing: border-box;
   display: grid;
+  place-items: center;
   mix-blend-mode: darken;
   border-radius: 50%;
   opacity: 0.6;
@@ -23,33 +23,43 @@
   animation: loading 1s infinite alternate;
 }
 
-.loading img {
-  display: none;
+#summy-button img {
   position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.not-loading img {
-  position: absolute;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .not-loading:hover {
   opacity: 1;
+  box-shadow: 0 0 50px 0 rgba(128, 34, 179, 0.9);
+  filter: drop-shadow(0 0 10px rgba(121, 79, 205, 0.8));
 }
 
 .not-loading {
-  margin: auto;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: rgba(128, 34, 179, 0.3);
+  position: relative;
+  border: 0px;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
   mix-blend-mode: darken;
-  padding: 0px;
-  border: none;
+  border-radius: 50%;
   opacity: 0.6;
+  transition: opacity 1s;
+  transition: box-shadow 1s;
+  transition: filter 1s;
+}
+
+.not-loading:before {
+  content: "";
+  margin: auto;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  color: #794fcd;
+  background: currentColor;
+  filter: blur(5px);
 }
 
 #summy-button {
@@ -80,20 +90,20 @@
 
 .badges-container {
   position: absolute;
-  top: -15px;
-  right: 3px;
+  top: -12px;
+  right: 5px;
   display: flex;
   gap: 3px;
 }
 
 .close-button {
   font-size: 15px;
-  padding: 3px;
+  padding: 2px;
   background: rgb(147, 147, 147);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,7 +117,7 @@
 
 .page-tldr {
   border-top: thin solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(90deg, rgb(45 14 99) 10%, rgb(212, 17, 115) 100%);
+  background: linear-gradient(90deg, rgb(45 14 99) 30%, rgb(212, 17, 115) 150%);
   line-height: 1.6;
   text-align: left;
   font-family: Arial, sans-serif;
@@ -148,6 +158,17 @@
   width: 100%;
 }
 
+.title-text {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.title-emojis {
+  font-size: 18px;
+  white-space: nowrap;
+
+}
+
 .content-text {
   line-height: 1.5;
   font-size: 14px;
@@ -162,7 +183,6 @@
   cursor: pointer;
   color: #cccccc;
   font-size: 12px;
-  margin-right: 15px;
   transition: color 0.2s;
 }
 
@@ -207,15 +227,13 @@
 
 .stress-title {
   font-size: 10px;
-  line-height: 1;
   display: block;
-  margin-top: 5px;
+  line-height: 1;
+  margin-top: 8px;
 }
 
 .stress-score {
   font-size: 30px;
-  margin-top: 5px;
-  line-height: 1;
   display: block;
 }
 
@@ -223,8 +241,6 @@
   font-size: 10px;
   line-height: 1;
   display: block;
-  margin-top: 3px;
-  margin-bottom: 2px;
 }
 
 @keyframes loading {
@@ -244,7 +260,6 @@
 
 .question-item:hover {
   color: white;
-  font-weight: bold;
 }
 
 /* Style scrollbar */
@@ -270,10 +285,9 @@
   .questions-container {
     display: none;
   }
-  
+
   .page-tldr {
     min-width: auto;
-    padding: 0px;
   }
 
   .summary-container {
@@ -283,6 +297,14 @@
   .content-title {
     font-size: 13px;
     margin-bottom: 5px;
+  }
+
+  .title-text {
+    flex: none;
+  }
+
+  .title-emojis {
+    font-size: 13px;
   }
 
   .content-text {
@@ -308,9 +330,4 @@
   .stress-category {
     font-size: 9px;
   }
-}
-
-.inline-emojis {
-  margin-left: 10px;
-  opacity: 0.9;
 }

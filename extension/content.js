@@ -33,7 +33,7 @@ function addSummary(root, css) {
 
             addStressScore(div, data.stress_score, data.emoji_outline);
             addContent(div, data.category, data.summary, data.emoji_outline);
-            addQuestions(div, data.category, data.summary, data.questions, data.answers);
+            addQuestions(div, data.questions, data.answers);
 
             // Create a container for the badges
             let badges = document.createElement("div");
@@ -164,32 +164,45 @@ function addContent(root, category, summary, emojis) {
     let container = document.createElement("div");
     container.classList.add("summary-container");
 
-    // Create content view
     let contentView = document.createElement("div");
     contentView.classList.add("content-view");
 
-    // Add title and text sections
     let title = document.createElement("div");
     title.classList.add("content-title");
 
-    let text = document.createElement("div");
-    text.classList.add("content-text");
+    let titleText = document.createElement("span");
+    titleText.classList.add("title-text");
+    titleText.textContent = category;
 
-    // Set initial content (summary)
-    title.innerHTML = `${category} <span class="inline-emojis">${emojis}</span>`;
-    text.innerText = summary;
+    let titleEmojis = document.createElement("span");
+    titleEmojis.classList.add("title-emojis");
+    titleEmojis.textContent = emojis;
+
+    title.appendChild(titleText);
+    title.appendChild(titleEmojis);
+
+    let contentText = document.createElement("div");
+    contentText.classList.add("content-text");
+    contentText.innerText = summary;
 
     contentView.appendChild(title);
-    contentView.appendChild(text);
+    contentView.appendChild(contentText);
 
     container.appendChild(contentView);
     root.appendChild(container);
 }
 
 // Add questions view to root
-function addQuestions(root, category, summary, questions, answers) {
+function addQuestions(root, questions, answers) {
     let container = document.createElement("div");
     container.classList.add("questions-container");
+
+    // Store the original content for back navigation
+    // Will be captured on first question click
+    const originalContent = {
+        title: null,
+        summary: null
+    };
 
     // Add questions
     questions.forEach((question, index) => {
@@ -200,17 +213,34 @@ function addQuestions(root, category, summary, questions, answers) {
             let title = root.querySelector(".content-title");
             let text = root.querySelector(".content-text");
 
-            // Update content to show answer
-            title.innerHTML = `<span class="back-button">◂ Back</span> ${question}`;
-            text.innerText = answers[index];
+            // Capture the original title on first question click
+            if (!originalContent.title) {
+                originalContent.title = title.innerHTML;
+            }
 
-            // Add back button functionality
-            title.querySelector('.back-button').onclick = (e) => {
+            // Capture the original summary on first question click
+            if (!originalContent.summary) {
+                originalContent.summary = text.innerText;
+            }
+
+            let titleText = document.createElement("span");
+            titleText.classList.add("title-text");
+            titleText.textContent = question;
+
+            let backButton = document.createElement("span");
+            backButton.classList.add("back-button");
+            backButton.textContent = "▸ Back";
+            backButton.onclick = (e) => {
                 e.stopPropagation();
-                // Always go back to category and summary
-                title.innerText = category;
-                text.innerText = summary;
+                // Always go back to the original content
+                title.innerHTML = originalContent.title;
+                text.innerText = originalContent.summary;
             };
+
+            title.innerHTML = "";
+            title.appendChild(titleText);
+            title.appendChild(backButton);
+            text.innerText = answers[index];
         };
         container.appendChild(questionElem);
     });
