@@ -21,9 +21,6 @@ function createSummyView(css) {
             // acknowledge the message
             sendResponse({received: true});
 
-            // parse the result
-            let data = JSON.parse(request.result);
-
             // Remove any existing elements and add the style
             shadow.innerHTML = "";
             shadow.appendChild(style);
@@ -31,11 +28,16 @@ function createSummyView(css) {
             let div = document.createElement("div");
             div.classList.add("page-tldr");
 
-            // parse the result and display summary
-            let data = JSON.parse(request.result);
-            div.appendChild(createStressScore(data.stress_score, data.emoji_outline));
-            div.appendChild(createContent(data.category, data.summary, data.emoji_outline));
-            div.appendChild(createQuestions(data.questions, data.answers, div));
+            if (request.error) {
+                div.appendChild(createError(request.error));
+                shadow.appendChild(div);
+            } else {
+                // parse the result and display summary
+                let data = JSON.parse(request.result);
+                div.appendChild(createStressScore(data.stress_score, data.emoji_outline));
+                div.appendChild(createContent(data.category, data.summary, data.emoji_outline));
+                div.appendChild(createQuestions(data.questions, data.answers, div));
+            }
 
             // Add close button
             let closeButton = document.createElement("div");
@@ -82,10 +84,10 @@ function createSummyButton(css) {
     button.appendChild(icon);
     button.classList.add("not-loading");
     button.onclick = function () {
+        const domString = document.documentElement.outerHTML;
+
         chrome.runtime.sendMessage(
-            {
-                msg: "summy_capture"
-            },
+            {msg: "summy_capture", html: domString},
             function () {
                 if (chrome.runtime.lastError) {
                     console.log("Summy capture error:", chrome.runtime.lastError.message);
@@ -122,6 +124,46 @@ function showSummyButton() {
     button.classList.remove("loading");
     button.classList.add("not-loading");
     root.style.display = "block";
+}
+
+// Create error view
+function createError(message) {
+    let errorView = document.createElement("div");
+    errorView.classList.add("error-view");
+
+    // Add error icon
+    let errorIcon = document.createElement("div");
+    errorIcon.classList.add("error-icon");
+    errorIcon.innerHTML = `<svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+    errorView.appendChild(errorIcon);
+
+    // Add error content container
+    let errorContent = document.createElement("div");
+    errorContent.classList.add("error-content");
+
+    // Add error message
+    let errorMessage = document.createElement("h3");
+    errorMessage.classList.add("error-message");
+    errorMessage.innerText = message;
+    errorContent.appendChild(errorMessage);
+    errorView.appendChild(errorContent);
+
+    // Add settings link
+    let optionsLink = document.createElement("a");
+    optionsLink.href = "#";
+    optionsLink.innerText = "Verify Settings";
+    optionsLink.classList.add("settings-link");
+    optionsLink.onclick = function(e) {
+        e.preventDefault();
+        if (chrome.runtime.openOptionsPage) {
+            chrome.runtime.openOptionsPage();
+        } else {
+            window.open(chrome.runtime.getURL('options.html'));
+        }
+    };
+    errorView.appendChild(optionsLink);
+
+    return errorView;
 }
 
 // Create stress score view

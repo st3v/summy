@@ -43,6 +43,7 @@
                 "<all_urls>"
             ],
             "resources": [
+                "options.html",
                 "images/button.png",
                 "content.css"
             ]

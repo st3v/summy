@@ -1,6 +1,5 @@
-// A static import is required in b/g scripts because they are executed in their own env
-// not connected to the content scripts where wasm is loaded automatically
-import initWasmModule, { summarize } from './wasm/summy_background.js';
+// import the wasm module and the summarize function
+import initWasmModule, { summarize as wasmSummarize } from './wasm/summy_background.js';
 import { MODEL_KEY, API_KEY_KEY, DEFAULT_MODEL } from './constants.js';
 
 console.log("Background script started");
@@ -11,47 +10,60 @@ console.log("Background script started");
     await initWasmModule();
 })();
 
+const contextMenuId = "summyContextMenu"
+
 chrome.contextMenus.create({
-    id: "summyContextMenuId",
+    id: contextMenuId,
     title: "Summarize with Summy",
     contexts:["page"],
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) =>
-    process(tab)
-);
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === contextMenuId) {
+        // Execute a content script to get the page HTML
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            function: () => document.documentElement.outerHTML
+        }, (results) => {
+            if (results && results[0] && results[0].result) {
+                const html = results[0].result;
+                summarize(tab, html);
+            } else {
+                console.error("Failed to get page HTML");
+            }
+        });
+    }
+});
 
-function process(tab){
+function summarize(tab, html) {
     // Get the model and API key from storage
     chrome.storage.sync.get({[MODEL_KEY]: DEFAULT_MODEL, [API_KEY_KEY]: ''}, function(items) {
         const model = items[MODEL_KEY];
         const apiKey = items[API_KEY_KEY];
 
-        chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: DOMtoString,
-        }).then(function (results) {
-            summarize(results[0].result, model, apiKey).then(function (summary) {
-                console.log("summarize: Summary: \n" + summary);
-                displaySummary(tab, summary);
-            })
+        if (!model) {
+            displaySummary(tab, null, "LLM model not set");
+            return;
+        }
+
+        wasmSummarize(html, model, apiKey).then(function (summary) {
+            console.log("summarize success:\n", summary);
+            displaySummary(tab, summary, null);
         }).catch(function (error) {
-            console.log("summarize: Error injecting script: \n" + error.message);
+            console.log("summarize error:", error);
+            displaySummary(tab, null, "Failed to summarize webpage");
         });
     });
 };
 
-function displaySummary(tab, summary) {
+function displaySummary(tab, summary, error) {
     chrome.tabs.sendMessage(tab.id,
         {
             msg: "summy_tldr",
-            result: summary
+            result: summary,
+            error: error
         }
     );
-}
-
-function DOMtoString() {
-    return document.documentElement.outerHTML;
 }
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
@@ -62,13 +74,13 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
         }
 
         chrome.tabs.query(params, function (tabs) {
-            process(tabs[0]);
+            summarize(tabs[0], request.html);
         });
 
         // acknowledge the message
         sendResponse({received: true});
 
-        // If you're doing async work, return true to keep the message channel open
+        // Return true to indicate we'll respond asynchronously
         return true;
     }
 });

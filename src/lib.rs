@@ -51,10 +51,10 @@ fn client(api_key: &str) -> Client {
 }
 
 #[wasm_bindgen]
-pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String, String> {
+pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String, JsError> {
     let text = match extract_text(html) {
         Ok(text) => text,
-        Err(e) => return Err(format!("Error extracting text: {}", e)),
+        Err(e) => return Err(JsError::new(&format!("Error extracting text: {:?}", e))),
     };
 
     let request = ChatRequest::new(vec![
@@ -72,10 +72,10 @@ pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String,
                 Some(text) => {
                     Ok(text.to_string())
                 },
-                _ => Err("No answer".to_string()),
+                _ => Err(JsError::new("No answer")),
             }
         },
-        Err(e) => Err(format!("Error during chat execution: {}", e)),
+        Err(e) => Err(JsError::new(&format!("Error during chat execution: {}", e))),
     }
 }
 
