@@ -1,44 +1,53 @@
-# Summy - Web Page Summarizer
+# Summy
 
-Summy is a Chrome extension that uses generative AI to provide quick, insightful summaries of web pages. It extracts the main content from any webpage and generates a concise summary along with relevant context.
+Summy is a Chrome extension that uses generative AI to provide quick, insightful summaries of web pages.
+
+Upon user request, Summy extracts the main content from a given webpage and uses an LLM of choice to generate a concise summary along with relevant context.
+
+Summy runs inside the browser. It interacts with the LLM provider of your choice but does not send any data elsewhere.
 
 ## Features
 
 - 🚀 One-click webpage summarization
-- 📊 Stress score for content evaluation
-- 💡 Auto-generated follow-up questions and answers
+- 🌐 Multi-language support with automatic language detection and matching
 - 🏷️ Smart content categorization
-- 😊 Emoji representation of content theme
-- 🌐 Multi-language support (adapts to the webpage's language)
+- 📊 Content analysis with stress level score
+- 😊 Emoji representation of content themes
+- 💡 Auto-generated follow-up questions and answers
+- ❓ Ask your own questions about the webpage content in the language of your choice
 
-## Technical Stack
-
-- **Frontend**: Chrome Extension (HTML, CSS, JavaScript)
-- **WebAssembly Module**: Rust compiled to WebAssembly (executed within the browser)
-- **AI Integration**: Multiple LLM support including:
+### AI Integration
+Summy supports multiple LLMs including:
   - Google Gemini
   - Anthropic Claude
-  - DeepSeek
   - OpenAI
+  - DeepSeek
   - Groq
   - Ollama
   - xAI
 
-## Project Structure
+## Installation
 
-```
-summy/
-├── extension/          # Chrome extension files
-│   ├── background.js   # Background script for service worker
-│   ├── content.css     # CSS for content script
-│   ├── content.js      # Content script for webpage interaction
-│   ├── images          # Extension icons
-│   ├── manifest.json   # Extension configuration
-│   ├── options.css     # CSS for options page
-│   ├── options.html    # Options page
-│   └── options.js      # JavaScript for options page
-└── src/                # Rust code for WASM module
-```
+Summy is not yet listed in the Chrome Web Store. For the time being, see [Development](#development) on how to build and install the extension.
+
+## Configuration
+
+in Chrome, visit Summy's options page to:
+- Select your preferred LLM model
+- Configure your API key
+- Test your LLM connection
+
+## Usage
+
+1. Click the Summy button floating on the lower right of the webpage or use the context menu
+2. Wait for the AI to process the page content
+3. View the summary with additional insights:
+   - Concise text summary
+   - Content category
+   - Stress level score (0-9)
+   - Follow-up questions and answers
+   - Emoji-based content visualization
+4. Ask your own questions
 
 ## Architecture
 
@@ -66,19 +75,6 @@ npm run release  # Production build
    - Enable "Developer mode"
    - Click "Load unpacked"
    - Select the `extension` directory
-
-## Configuration
-
-Visit the extension options page to:
-- Select your preferred LLM model
-- Configure your API key
-- Test your LLM connection
-
-## Usage
-
-1. Click the Summy icon in your browser toolbar or use the context menu
-2. Wait for the AI to process the page content
-3. View the summary with additional insights in the overlay
 
 ## License
 
