@@ -231,21 +231,151 @@
   display: flex;
   flex-direction: column;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-question-container {
+  margin-bottom: 20px;
+  padding-right: 10px;
+  /* background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--summy-radius);
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); */
+  flex-shrink: 0;
+}
+
+.custom-question-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  opacity: 0.9;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+}
+
+.custom-question-form {
+  display: flex;
+  gap: 8px;
+}
+
+.custom-question-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: calc(var(--summy-radius) / 2);
+  padding: 10px 12px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: var(--summy-transition);
+}
+
+.custom-question-input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-question-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.custom-question-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: calc(var(--summy-radius) / 2);
+  color: white;
+  font-weight: 600;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: var(--summy-transition);
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.custom-question-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.custom-question-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.custom-question-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.questions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  /* Ensure the section takes full available height */
+  height: 100%;
+}
+
+.questions-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   overflow-y: auto;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  max-height: calc(40vh - 170px);
+  min-height: 100px;
 }
 
 .question-item {
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: var(--summy-radius);
   cursor: pointer;
   transition: var(--summy-transition);
-  font-size: 13px;
+  font-size: 14px;
+  margin-top: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .question-item:hover {
   background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.question-item:active {
+  transform: translateY(0);
+}
+
+.question-item.custom-question {
+  border-left: 3px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .back-button {
@@ -299,24 +429,24 @@
 }
 
 .content-text::-webkit-scrollbar,
-.questions-container::-webkit-scrollbar {
+.questions-list::-webkit-scrollbar {
   width: 6px;
 }
 
 .content-text::-webkit-scrollbar-track,
-.questions-container::-webkit-scrollbar-track {
+.questions-list::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 3px;
 }
 
 .content-text::-webkit-scrollbar-thumb,
-.questions-container::-webkit-scrollbar-thumb {
+.questions-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
 }
 
 .content-text::-webkit-scrollbar-thumb:hover,
-.questions-container::-webkit-scrollbar-thumb:hover {
+.questions-list::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 

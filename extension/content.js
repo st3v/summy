@@ -87,10 +87,10 @@ function createSummyButton(css) {
         const domString = document.documentElement.outerHTML;
 
         chrome.runtime.sendMessage(
-            {msg: "summy_capture", html: domString},
+            {msg: "summy_summarize", html: domString},
             function () {
                 if (chrome.runtime.lastError) {
-                    console.log("Summy capture error:", chrome.runtime.lastError.message);
+                    console.log("Summy summarize error:", chrome.runtime.lastError.message);
                     return;
                 }
                 button.classList.add("loading");
@@ -247,33 +247,160 @@ function createQuestions(questions, answers, parent) {
         summary: textView.innerText
     };
 
-    // Add questions
-    questions.forEach((question, index) => {
-        let questionElem = document.createElement("div");
-        questionElem.classList.add("question-item");
-        questionElem.innerHTML = question;
-        questionElem.onclick = () => {
-            let titleText = document.createElement("span");
-            titleText.classList.add("title-text");
-            titleText.textContent = question;
+    // Add custom question input
+    let customQuestionContainer = document.createElement("div");
+    customQuestionContainer.classList.add("custom-question-container");
 
-            let backButton = document.createElement("span");
-            backButton.classList.add("back-button");
-            backButton.textContent = "Back to Summary";
-            backButton.onclick = (e) => {
-                e.stopPropagation();
-                // Always go back to the original content
-                titleView.innerHTML = originalContent.title;
-                textView.innerText = originalContent.summary;
-            };
+    let inputLabel = document.createElement("div");
+    inputLabel.classList.add("custom-question-label");
+    inputLabel.textContent = "Ask your own question";
 
-            titleView.innerHTML = "";
-            titleView.appendChild(titleText);
-            titleView.appendChild(backButton);
-            textView.innerText = answers[index];
+    let inputForm = document.createElement("form");
+    inputForm.classList.add("custom-question-form");
+
+    let input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Type your question here...";
+    input.classList.add("custom-question-input");
+
+    let button = document.createElement("button");
+    button.type = "submit";
+    button.classList.add("custom-question-button");
+    button.textContent = "Ask";
+
+    // Prevent form submission
+    inputForm.onsubmit = (e) => {
+        e.preventDefault();
+        submitCustomQuestion();
+    };
+
+    // Function to handle custom question submission
+    const submitCustomQuestion = async () => {
+        const question = input.value.trim();
+        if (!question) return;
+
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = '<span class="loader"></span>';
+
+        // Immediately update the title view with the question and a loading message in the text view
+        let titleText = document.createElement("span");
+        titleText.classList.add("title-text");
+        titleText.textContent = question;
+
+        let backButton = document.createElement("span");
+        backButton.classList.add("back-button");
+        backButton.textContent = "Back to Summary";
+        backButton.onclick = (e) => {
+            e.stopPropagation();
+            titleView.innerHTML = originalContent.title;
+            textView.innerText = originalContent.summary;
         };
-        container.appendChild(questionElem);
-    });
+
+        titleView.innerHTML = "";
+        titleView.appendChild(titleText);
+        titleView.appendChild(backButton);
+        textView.innerText = "Getting answer...";
+
+        try {
+            // Get the entire DOM as string to use as context for the question
+            const domString = document.documentElement.outerHTML;
+
+            // Send message to background script
+            chrome.runtime.sendMessage(
+                {
+                    msg: "summy_answer",
+                    question: question,
+                    html: domString
+                },
+                (response) => {
+                    console.log("Custom question response:", response);
+                    // Reset button state
+                    button.disabled = false;
+                    button.innerHTML = "Ask";
+
+                    if (chrome.runtime.lastError) {
+                        console.error("Error:", chrome.runtime.lastError);
+                        textView.innerText = 'Failed to get answer. Please try again.';
+                        return;
+                    }
+
+                    if (!response || !response.success) {
+                        textView.innerText = response?.error || 'Invalid response. Please try again.';
+                        return;
+                    }
+
+                    if (response.answer) {
+                        // Update the text view with the answer
+                        textView.innerText = response.answer;
+
+                        // Clear the input
+                        input.value = "";
+                    }
+                }
+            );
+        } catch (error) {
+            console.error("Error processing custom question:", error);
+            button.disabled = false;
+            button.innerHTML = "Ask";
+            textView.innerText = 'An error occurred while processing your question. Please try again.';
+        }
+    };
+
+    inputForm.appendChild(input);
+    inputForm.appendChild(button);
+    customQuestionContainer.appendChild(inputLabel);
+    customQuestionContainer.appendChild(inputForm);
+    container.appendChild(customQuestionContainer);
+
+    // Create a section for questions (both predefined and custom)
+    let questionsSection = document.createElement("div");
+    questionsSection.classList.add("questions-section");
+
+    // Add predefined questions
+    if (questions && questions.length > 0) {
+        // Create label for suggested questions (outside the scrollable area)
+        let predefinedLabel = document.createElement("div");
+        predefinedLabel.classList.add("questions-section-label");
+        predefinedLabel.textContent = "Suggested questions";
+        questionsSection.appendChild(predefinedLabel);
+
+        // Create a container for scrollable questions
+        let questionsList = document.createElement("div");
+        questionsList.classList.add("questions-list");
+
+        questions.forEach((question, index) => {
+            let questionElem = document.createElement("div");
+            questionElem.classList.add("question-item");
+            questionElem.innerHTML = question;
+            questionElem.onclick = () => {
+                let titleText = document.createElement("span");
+                titleText.classList.add("title-text");
+                titleText.textContent = question;
+
+                let backButton = document.createElement("span");
+                backButton.classList.add("back-button");
+                backButton.textContent = "Back to Summary";
+                backButton.onclick = (e) => {
+                    e.stopPropagation();
+                    // Always go back to the original content
+                    titleView.innerHTML = originalContent.title;
+                    textView.innerText = originalContent.summary;
+                };
+
+                titleView.innerHTML = "";
+                titleView.appendChild(titleText);
+                titleView.appendChild(backButton);
+                textView.innerText = answers[index];
+            };
+            questionsList.appendChild(questionElem);
+        });
+
+        // Add the questions list to the section
+        questionsSection.appendChild(questionsList);
+    }
+
+    container.appendChild(questionsSection);
 
     return container;
 }
