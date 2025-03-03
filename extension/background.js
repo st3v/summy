@@ -1,24 +1,23 @@
 // import the wasm module and the summarize function
-import initWasmModule, { summarize, answer } from './wasm/summy_background.js';
+import * as wasm from './wasm/summy_background.js';
 import { MODEL_KEY, API_KEY_KEY, DEFAULT_MODEL } from './constants.js';
+
+(async function() {
+    await wasm.default();
+})();
 
 console.log("Background script started");
 
-// Initialize the WASM module
-(async function() {
-    await initWasmModule();
-})();
-
-const contextMenuId = "summyContextMenu"
+const CONTEXT_MENU_KEY = "summyContextMenu"
 
 chrome.contextMenus.create({
-    id: contextMenuId,
+    id: CONTEXT_MENU_KEY,
     title: "Summarize with Summy",
     contexts:["page"],
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === contextMenuId) {
+    if (info.menuItemId === CONTEXT_MENU_KEY) {
         // Execute a content script to get the page HTML
         chrome.scripting.executeScript({
             target: { tabId: tab.id },
@@ -45,7 +44,7 @@ function summarizePage(tab, html) {
             return;
         }
 
-        return summarize(html, model, apiKey).then(function (summary) {
+        return wasm.summarize(html, model, apiKey).then(function (summary) {
             console.log("summarize success:\n", summary);
             displaySummary(tab, summary, null);
         }).catch(function (error) {
@@ -56,18 +55,22 @@ function summarizePage(tab, html) {
 };
 
 function displaySummary(tab, summary, error) {
-    chrome.tabs.sendMessage(tab.id,
-        {
-            msg: "summy_tldr",
-            result: summary,
-            error: error
-        }
-    );
+    try {
+        chrome.tabs.sendMessage(tab.id,
+            {
+                msg: "summy_tldr",
+                result: summary,
+                error: error
+            }
+        ).catch(err => console.debug(`Could not send message to tab ${tab.id}:`, err));
+    } catch (error) {
+        console.debug(`Error sending message to tab ${tab.id}:`, error);
+    }
 }
 
 // Process custom questions using promise syntax
 function askQuestion(question, html, apiKey, model) {
-    return answer(question, html, model, apiKey)
+    return wasm.answer(question, html, model, apiKey)
         .then(result => {
             return {
                 success: true,
@@ -86,18 +89,13 @@ function askQuestion(question, html, apiKey, model) {
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     switch (request.msg) {
         case "summy_summarize":
-            let params = {
-                currentWindow: true,
-                active: true
-            }
-
-            chrome.tabs.query(params, function (tabs) {
-                summarizePage(tabs[0], request.html);
+            chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+                if (tabs.length > 0) {
+                    summarizePage(tabs[0], request.html);
+                }
             });
-
             // acknowledge the message
             sendResponse({received: true});
-
             // return true to keep the message channel open
             return true;
         case "summy_answer":

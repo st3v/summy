@@ -1,10 +1,22 @@
-// Load CSS file and create elements
-fetch(chrome.runtime.getURL('content.css'))
-    .then(response => response.text())
-    .then(css => {
-        document.body.append(createSummyButton(css));
-        document.body.append(createSummyView(css));
-    });
+// Would love to import constants.js here :(
+// See: https://stackoverflow.com/a/79472346
+const SHOW_BUTTON_KEY = 'show_button';
+const SHOW_BUTTON_DEFAULT = true;
+
+initializeUI();
+
+// Load CSS and initialize UI
+function initializeUI() {
+    fetch(chrome.runtime.getURL('content.css'))
+        .then(response => response.text())
+        .then(css => {
+            buttonRoot = createSummyButton(css);
+            summaryRoot = createSummyView(css);
+
+            document.body.append(buttonRoot);
+            document.body.append(summaryRoot);
+        });
+}
 
 function createSummyView(css) {
     let container = document.createElement("div");
@@ -124,6 +136,26 @@ function createSummyButton(css) {
     shadow.appendChild(style);
     shadow.appendChild(button);
 
+    // Check button visibility setting
+    chrome.storage.sync.get({ [SHOW_BUTTON_KEY]: SHOW_BUTTON_DEFAULT }, function(result) {
+        if (!result[SHOW_BUTTON_KEY]) {
+            container.classList.add('hidden');
+        }
+    });
+
+    // Listen for visibility updates
+    chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+        if (request.msg === "summy_update_button_visibility") {
+            if (request.show) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+            sendResponse({received: true});
+        }
+        return true;
+    });
+
     return container;
 }
 
@@ -133,11 +165,18 @@ function hideSummyButton() {
 }
 
 function showSummyButton() {
-    const root = document.querySelector('#summy-button-root');
-    const button = root.shadowRoot.querySelector('#summy-button');
-    button.classList.remove("loading");
-    button.classList.add("not-loading");
-    root.style.display = "block";
+    chrome.storage.sync.get({ [SHOW_BUTTON_KEY]: true }, function(result) {
+        const root = document.querySelector('#summy-button-root');
+        if (result[SHOW_BUTTON_KEY]) {
+            const button = root.shadowRoot.querySelector('#summy-button');
+            button.classList.remove("loading");
+            button.classList.add("not-loading");
+            root.style.display = "block";
+            root.classList.remove('hidden');
+        } else {
+            root.classList.add('hidden');
+        }
+    });
 }
 
 // Create error view

@@ -21,6 +21,10 @@
   width: 48px;
 }
 
+#summy-button-root.hidden {
+  display: none;
+}
+
 .loading {
   position: relative;
   border: 0px;
