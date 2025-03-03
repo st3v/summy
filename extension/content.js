@@ -41,11 +41,17 @@ function addSummary(root, css) {
             closeButton.innerHTML = "×";
             closeButton.title = "Close Summary";
             closeButton.onclick = function() {
-                // Remove everything from the shadow root
-                shadow.innerHTML = "";
+                // Add the slide-down animation class
+                div.classList.add("slide-down");
 
-                // Show the button
-                showSummyButton();
+                // Wait for the animation to complete before removing the content
+                setTimeout(() => {
+                    // Remove everything from the shadow root
+                    shadow.innerHTML = "";
+
+                    // Show the button
+                    showSummyButton();
+                }, 400); // Match the animation duration (0.4s)
             };
             div.appendChild(closeButton);
 
