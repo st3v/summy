@@ -2,11 +2,11 @@
 fetch(chrome.runtime.getURL('content.css'))
     .then(response => response.text())
     .then(css => {
-        addButton(document.body, css);
-        addSummary(document.body, css);
+        document.body.append(createSummyButton(css));
+        document.body.append(createSummyView(css));
     });
 
-function addSummary(root, css) {
+function createSummyView(css) {
     let container = document.createElement("div");
     container.id = "summy-summary-root";
 
@@ -31,9 +31,11 @@ function addSummary(root, css) {
             let div = document.createElement("div");
             div.classList.add("page-tldr");
 
-            addStressScore(div, data.stress_score, data.emoji_outline);
-            addContent(div, data.category, data.summary, data.emoji_outline);
-            addQuestions(div, data.questions, data.answers);
+            // parse the result and display summary
+            let data = JSON.parse(request.result);
+            div.appendChild(createStressScore(data.stress_score, data.emoji_outline));
+            div.appendChild(createContent(data.category, data.summary, data.emoji_outline));
+            div.appendChild(createQuestions(data.questions, data.answers, div));
 
             // Add close button
             let closeButton = document.createElement("div");
@@ -65,10 +67,10 @@ function addSummary(root, css) {
         return true;
     });
 
-    root.appendChild(container);
+    return container;
 }
 
-function addButton(root, css) {
+function createSummyButton(css) {
     // Create icon element
     let icon = document.createElement("img");
     icon.src = chrome.runtime.getURL("images/button.png");
@@ -106,8 +108,7 @@ function addButton(root, css) {
     shadow.appendChild(style);
     shadow.appendChild(button);
 
-    // Add button to the root
-    root.appendChild(container);
+    return container;
 }
 
 function hideSummyButton() {
@@ -123,8 +124,8 @@ function showSummyButton() {
     root.style.display = "block";
 }
 
-// Add stress score view to root
-function addStressScore(root, score) {
+// Create stress score view
+function createStressScore(score) {
     let container = document.createElement("div");
     container.classList.add("stress-container");
 
@@ -154,11 +155,11 @@ function addStressScore(root, score) {
     levelElem.innerText = level;
     container.appendChild(levelElem);
 
-    root.appendChild(container);
+    return container;
 }
 
-// Add content view to root
-function addContent(root, category, summary, emojis) {
+// Create content view
+function createContent(category, summary, emojis) {
     let container = document.createElement("div");
     container.classList.add("summary-container");
 
@@ -187,19 +188,21 @@ function addContent(root, category, summary, emojis) {
     contentView.appendChild(contentText);
 
     container.appendChild(contentView);
-    root.appendChild(container);
+    return container;
 }
 
-// Add questions view to root
-function addQuestions(root, questions, answers) {
+// Create questions view
+function createQuestions(questions, answers, parent) {
     let container = document.createElement("div");
     container.classList.add("questions-container");
 
+    titleView = parent.querySelector(".content-title");
+    textView = parent.querySelector(".content-text");
+
     // Store the original content for back navigation
-    // Will be captured on first question click
     const originalContent = {
-        title: null,
-        summary: null
+        title: titleView.innerHTML,
+        summary: textView.innerText
     };
 
     // Add questions
@@ -208,19 +211,6 @@ function addQuestions(root, questions, answers) {
         questionElem.classList.add("question-item");
         questionElem.innerHTML = question;
         questionElem.onclick = () => {
-            let title = root.querySelector(".content-title");
-            let text = root.querySelector(".content-text");
-
-            // Capture the original title on first question click
-            if (!originalContent.title) {
-                originalContent.title = title.innerHTML;
-            }
-
-            // Capture the original summary on first question click
-            if (!originalContent.summary) {
-                originalContent.summary = text.innerText;
-            }
-
             let titleText = document.createElement("span");
             titleText.classList.add("title-text");
             titleText.textContent = question;
@@ -231,17 +221,17 @@ function addQuestions(root, questions, answers) {
             backButton.onclick = (e) => {
                 e.stopPropagation();
                 // Always go back to the original content
-                title.innerHTML = originalContent.title;
-                text.innerText = originalContent.summary;
+                titleView.innerHTML = originalContent.title;
+                textView.innerText = originalContent.summary;
             };
 
-            title.innerHTML = "";
-            title.appendChild(titleText);
-            title.appendChild(backButton);
-            text.innerText = answers[index];
+            titleView.innerHTML = "";
+            titleView.appendChild(titleText);
+            titleView.appendChild(backButton);
+            textView.innerText = answers[index];
         };
         container.appendChild(questionElem);
     });
 
-    root.appendChild(container);
+    return container;
 }
