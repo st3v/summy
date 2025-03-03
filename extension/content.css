@@ -404,6 +404,38 @@
   transform: translateX(-2px);
 }
 
+.close-button, .settings-button {
+  position: absolute;
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--summy-transition);
+  font-size: 16px;
+  font-weight: 600;
+  z-index: 10;
+  opacity: 0.5;
+}
+
+.close-button {
+  right: 12px;
+}
+
+.settings-button {
+  right: 44px;
+  font-size: 22px;
+}
+
+.close-button:hover, .settings-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 0.9;
+}
+
 .close-button {
   position: absolute;
   top: 12px;
@@ -574,7 +606,7 @@
   }
 
   .title-emojis {
-    margin-right: 25px;
+    margin-right: 60px;
   }
 }
 

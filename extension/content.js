@@ -39,6 +39,20 @@ function createSummyView(css) {
                 div.appendChild(createQuestions(data.questions, data.answers, div));
             }
 
+            // Add settings button
+            let settingsButton = document.createElement("div");
+            settingsButton.classList.add("settings-button");
+            settingsButton.innerHTML = "⚙";
+            settingsButton.title = "Open Settings";
+            settingsButton.onclick = function() {
+                if (chrome.runtime.openOptionsPage) {
+                    chrome.runtime.openOptionsPage();
+                } else {
+                    window.open(chrome.runtime.getURL('options.html'));
+                }
+            };
+            div.appendChild(settingsButton);
+
             // Add close button
             let closeButton = document.createElement("div");
             closeButton.classList.add("close-button");
