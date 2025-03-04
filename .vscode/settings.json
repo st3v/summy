@@ -1,3 +1,14 @@
 {
-    "rust-analyzer.check.command": "clippy"
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "rust-analyzer.rustfmt.rangeFormatting.enable": true,
+    "rust-analyzer.check.overrideCommand": [
+        "cargo",
+        "clippy",
+        "--fix",
+        "--workspace",
+        "--message-format=json",
+        "--all-targets",
+        "--allow-dirty"
+    ],
 }

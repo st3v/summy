@@ -1,7 +1,12 @@
-use wasm_bindgen::prelude::*;
 use dom_content_extraction::{get_content, scraper::Html};
-use genai::{adapter::AdapterKind, chat::{ChatMessage, ChatOptions, ChatRequest, ChatResponseFormat, JsonSpec}, resolver::{AuthData, AuthResolver}, Client, ModelIden};
+use genai::{
+    adapter::AdapterKind,
+    chat::{ChatMessage, ChatOptions, ChatRequest, ChatResponseFormat, JsonSpec},
+    resolver::{AuthData, AuthResolver},
+    Client, ModelIden,
+};
 use std::sync::LazyLock;
+use wasm_bindgen::prelude::*;
 
 mod util;
 
@@ -21,22 +26,18 @@ extern "C" {
 pub async fn verify_access(model: &str, api_key: &str) -> Result<String, String> {
     let request = ChatRequest::new(vec![
         ChatMessage::system("Always reply with \"Access confirmed\"."),
-		ChatMessage::user("Is this working?"),
-	]);
+        ChatMessage::user("Is this working?"),
+    ]);
 
     let client = client(api_key);
 
     match client.exec_chat(model, request.clone(), None).await {
-        Ok(resp) => {
-            match resp.content_text_as_str() {
-                Some(text) => {
-                    Ok(text.trim().to_string())
-                },
-                _ => {
-                    let msg = "Access worked but the model did not answer.";
-                    log(&format!("Error verifying LLM access: {:?}", msg));
-                    Err(msg.to_string())
-                }
+        Ok(resp) => match resp.content_text_as_str() {
+            Some(text) => Ok(text.trim().to_string()),
+            _ => {
+                let msg = "Access worked but the model did not answer.";
+                log(&format!("Error verifying LLM access: {:?}", msg));
+                Err(msg.to_string())
             }
         },
         Err(err) => {
@@ -54,29 +55,32 @@ pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String,
     };
 
     let request = ChatRequest::new(vec![
-    	ChatMessage::system(SUMMARIZE_SYSTEM_PROMPT),
-    	ChatMessage::user(text),
-	]);
+        ChatMessage::system(SUMMARIZE_SYSTEM_PROMPT),
+        ChatMessage::user(text),
+    ]);
 
     let client = client(api_key);
     let options = summarize_chat_options(&client, model);
-    let response = client.exec_chat(model, request.clone(), Some(&options)).await;
+    let response = client
+        .exec_chat(model, request.clone(), Some(&options))
+        .await;
 
     match response {
-        Ok(resp) => {
-            match resp.content_text_as_str() {
-                Some(text) => {
-                    Ok(text.trim().to_string())
-                },
-                _ => Err(JsError::new("No answer")),
-            }
+        Ok(resp) => match resp.content_text_as_str() {
+            Some(text) => Ok(text.trim().to_string()),
+            _ => Err(JsError::new("No answer")),
         },
         Err(e) => Err(JsError::new(&format!("Error during chat execution: {}", e))),
     }
 }
 
 #[wasm_bindgen]
-pub async fn answer(question: &str, html: &str, model: &str, api_key: &str) -> Result<String, JsError> {
+pub async fn answer(
+    question: &str,
+    html: &str,
+    model: &str,
+    api_key: &str,
+) -> Result<String, JsError> {
     let client = client(api_key);
 
     // Phase 1: Detect language
@@ -86,11 +90,9 @@ pub async fn answer(question: &str, html: &str, model: &str, api_key: &str) -> R
     ]);
 
     let language = match client.exec_chat(model, detect_request, None).await {
-        Ok(resp) => {
-            match resp.content_text_as_str() {
-                Some(lang) => lang.trim().to_string(),
-                None => return Err(JsError::new("No language detected")),
-            }
+        Ok(resp) => match resp.content_text_as_str() {
+            Some(lang) => lang.trim().to_string(),
+            None => return Err(JsError::new("No language detected")),
         },
         Err(e) => return Err(JsError::new(&format!("Error detecting language: {}", e))),
     };
@@ -118,16 +120,14 @@ pub async fn answer(question: &str, html: &str, model: &str, api_key: &str) -> R
 
     let response = client.exec_chat(model, request.clone(), None).await;
     match response {
-        Ok(resp) => {
-            match resp.content_text_as_str() {
-                Some(text) => {
-                    log(&format!("Answer: {}", text));
-                    Ok(text.trim().to_string())
-                },
-                None => {
-                    log("No answer");
-                    Err(JsError::new("No answer"))
-                }
+        Ok(resp) => match resp.content_text_as_str() {
+            Some(text) => {
+                log(&format!("Answer: {}", text));
+                Ok(text.trim().to_string())
+            }
+            None => {
+                log("No answer");
+                Err(JsError::new("No answer"))
             }
         },
         Err(e) => {
@@ -155,23 +155,23 @@ fn client(api_key: &str) -> Client {
 }
 
 fn summarize_chat_options(client: &Client, model: &str) -> ChatOptions {
-    let adapter_kind = client.resolve_service_target(model).unwrap().model.adapter_kind;
+    let adapter_kind = client
+        .resolve_service_target(model)
+        .unwrap()
+        .model
+        .adapter_kind;
+
     log(&format!("Adapter kind: {:?}", adapter_kind.as_str()));
+
     match adapter_kind {
         AdapterKind::Groq | AdapterKind::Ollama => {
             // Groq and Ollama do currently not support json_schema
-            ChatOptions::default().with_response_format(
-                ChatResponseFormat::JsonMode
-            )
-        },
-        _ => {
-            ChatOptions::default().with_response_format(
-                JsonSpec::new(
-                    "response",
-                    (*SUMMARIZE_JSON_SCHEMA).clone()
-                )
-            )
+            ChatOptions::default().with_response_format(ChatResponseFormat::JsonMode)
         }
+        _ => ChatOptions::default().with_response_format(JsonSpec::new(
+            "response-schema",
+            (*SUMMARIZE_JSON_SCHEMA).clone(),
+        )),
     }
 }
 
@@ -316,7 +316,6 @@ const SUMMARIZE_SYSTEM_PROMPT: &str = r#"
     - Use EXACTLY 5 unique Unicode emojis
     - Use emojis that represent the main outline of the text
     - Ensure emojis provide an accurate summary of the content
-    - Separate with single spaces
     - No ASCII emoticons or alphanumeric characters
     - Example: "⛵️💨🧍‍♂️🔄🌍" for a text about "Sailing Solo Around The World"
 

@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
-use wasm_bindgen_test::*;
 use unicode_segmentation::UnicodeSegmentation;
+use wasm_bindgen_test::*;
 
 // Configure tests to run in browser
 wasm_bindgen_test_configure!(run_in_browser);
@@ -19,15 +19,24 @@ async fn verify_access() {
 async fn verify_access_invalid() {
     let result = crate::verify_access("", "").await;
     assert!(result.is_err());
-    assert_eq!(result.unwrap_err(), "Could not access LLM. Please verify model name and API key.");
+    assert_eq!(
+        result.unwrap_err(),
+        "Could not access LLM. Please verify model name and API key."
+    );
 
     let result = crate::verify_access("not_a_valid_model", "").await;
     assert!(result.is_err());
-    assert_eq!(result.unwrap_err(), "Could not access LLM. Please verify model name and API key.");
+    assert_eq!(
+        result.unwrap_err(),
+        "Could not access LLM. Please verify model name and API key."
+    );
 
     let result = crate::verify_access("gemini-2.0-flash-lite", "not_a_valid_api_key").await;
     assert!(result.is_err());
-    assert_eq!(result.unwrap_err(), "Could not access LLM. Please verify model name and API key.");
+    assert_eq!(
+        result.unwrap_err(),
+        "Could not access LLM. Please verify model name and API key."
+    );
 }
 
 #[wasm_bindgen_test]
@@ -292,13 +301,25 @@ fn assert_summary_response(got: &str, expected_topic_term: &str) {
 
     // Assert stress_score is an integer between 0 and 9
     let stress_score = value.get("stress_score").unwrap().as_i64().unwrap();
-    assert!(stress_score >= 0 && stress_score <= 9, "Expected stress_score to be between 0 and 9, got {}", stress_score);
+    assert!(
+        stress_score >= 0 && stress_score <= 9,
+        "Expected stress_score to be between 0 and 9, got {}",
+        stress_score
+    );
 
     // Assert trust_score is an integer between 0 and 9
     let trust_score = value.get("trust_score").unwrap().as_i64().unwrap();
-    assert!(trust_score >= 0 && trust_score <= 9, "Expected trust_score to be between 0 and 9, got {}", trust_score);
+    assert!(
+        trust_score >= 0 && trust_score <= 9,
+        "Expected trust_score to be between 0 and 9, got {}",
+        trust_score
+    );
 
     // Assert emoji_outline is a non-empty String with at least 3 emojis
     let emoji_outline = value.get("emoji_outline").unwrap().as_str().unwrap();
-    assert!(emoji_outline.graphemes(true).count() > 3, "Expected emoji_outline to have at least 3 emojis, got {}", emoji_outline);
+    assert!(
+        emoji_outline.graphemes(true).count() > 3,
+        "Expected emoji_outline to have at least 3 emojis, got {}",
+        emoji_outline
+    );
 }
