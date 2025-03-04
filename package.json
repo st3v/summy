@@ -8,6 +8,7 @@
         "dev": "npm run build -- --dev",
         "release": "npm run build -- --release",
         "clean": "rm -rf extension/wasm",
-        "publish": "npm run build release && npm run update-manifest"
+        "package": "./scripts/package.sh",
+        "publish": "npm run build release && npm run update-manifest && npm run package"
     }
 }
