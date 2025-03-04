@@ -120,6 +120,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Download packaged extension
         uses: actions/download-artifact@v4
@@ -127,11 +129,21 @@ jobs:
           name: summy-extension
           path: ./
 
-      - name: Get version
+      - name: Get current version
         id: get_version
         run: echo "version=$(grep '^version' Cargo.toml | head -1 | awk -F '"' '{print $2}')" >> $GITHUB_OUTPUT
 
+      - name: Check if version exists as a tag
+        id: check_tag
+        run: |
+          if git tag -l "v${{ steps.get_version.outputs.version }}" | grep -q .; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           files: ./summy.zip
