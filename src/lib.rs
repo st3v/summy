@@ -236,8 +236,8 @@ const SUMMARIZE_SYSTEM_PROMPT: &str = r#"
 
     !!!CRITICAL - LANGUAGE MATCHING REQUIREMENT!!!
     You MUST detect and use the same language as the input text for ALL outputs:
-    - If the text is in German, ALL your outputs must be in German
     - If the text is in English, ALL your outputs must be in English
+    - If the text is in German, ALL your outputs must be in German
     - If the text is in any other language, ALL your outputs must be in that language
     This applies to the summary, category, questions, answers - EVERYTHING
     DO NOT mix languages or translate anything!
@@ -260,8 +260,16 @@ const SUMMARIZE_SYSTEM_PROMPT: &str = r#"
     - For structured data: Transform into natural language
 
     BAD SUMMARY EXAMPLE (wrong language):
+    Original English text: "The economy is slowly recovering..."
+    Bad response: "Die Wirtschaft erholt sich langsam..."
+
+    BAD SUMMARY EXAMPLE (wrong language):
     Original German text: "Die Wirtschaft erholt sich langsam..."
     Bad response: "The economy is slowly recovering..."
+
+    GOOD SUMMARY EXAMPLE (maintains language):
+    Original English text: "The economy is slowly recovering..."
+    Good response: "The economy is showing signs of gradual recovery..."
 
     GOOD SUMMARY EXAMPLE (maintains language):
     Original German text: "Die Wirtschaft erholt sich langsam..."
@@ -377,7 +385,9 @@ static SUMMARIZE_JSON_SCHEMA: LazyLock<serde_json::Value> = LazyLock::new(|| {
             },
             "emoji_outline": {
                 "type": "string",
-                "pattern": "^[\\p{Emoji}]\\s[\\p{Emoji}]\\s[\\p{Emoji}]\\s[\\p{Emoji}]\\s[\\p{Emoji}]$"
+                "pattern": "^[\\p{Emoji}]\\s[\\p{Emoji}]\\s[\\p{Emoji}]\\s[\\p{Emoji}]\\s[\\p{Emoji}]$",
+                "minLength": 5,
+                "maxLength": 5
             }
         },
         "required": [

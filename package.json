@@ -7,6 +7,7 @@
         "build": "wasm-pack build --no-typescript --out-dir 'extension/wasm' --target web",
         "dev": "npm run build -- --dev",
         "test": "wasm-pack test --headless --chrome",
+        "test-repeat": "while npm run test; do :; done",
         "release": "npm run build -- --release",
         "clean": "rm -rf extension/wasm",
         "package": "./scripts/package.sh",
