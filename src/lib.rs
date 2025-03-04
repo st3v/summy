@@ -70,7 +70,10 @@ pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String,
             Some(text) => Ok(text.trim().to_string()),
             _ => Err(JsError::new("No answer")),
         },
-        Err(e) => Err(JsError::new(&format!("Error during chat execution: {}", e))),
+        Err(e) => {
+            log(&format!("Error: {:?}", e));
+            Err(JsError::new(&format!("Error: {:?}", e)))
+        }
     }
 }
 
@@ -97,8 +100,6 @@ pub async fn answer(
         Err(e) => return Err(JsError::new(&format!("Error detecting language: {}", e))),
     };
 
-    log(&format!("Detected language: {}", language));
-
     // Extract text from HTML
     let text = match extract_text(html) {
         Ok(text) => text,
@@ -121,18 +122,12 @@ pub async fn answer(
     let response = client.exec_chat(model, request.clone(), None).await;
     match response {
         Ok(resp) => match resp.content_text_as_str() {
-            Some(text) => {
-                log(&format!("Answer: {}", text));
-                Ok(text.trim().to_string())
-            }
-            None => {
-                log("No answer");
-                Err(JsError::new("No answer"))
-            }
+            Some(text) => Ok(text.trim().to_string()),
+            None => Err(JsError::new("No answer")),
         },
         Err(e) => {
-            log(&format!("Error: {}", e));
-            Err(JsError::new(&format!("Error during chat execution: {}", e)))
+            log(&format!("Error: {:?}", e));
+            Err(JsError::new(&format!("Error: {:?}", e)))
         }
     }
 }
@@ -160,8 +155,6 @@ fn summarize_chat_options(client: &Client, model: &str) -> ChatOptions {
         .unwrap()
         .model
         .adapter_kind;
-
-    log(&format!("Adapter kind: {:?}", adapter_kind.as_str()));
 
     match adapter_kind {
         AdapterKind::Groq | AdapterKind::Ollama => {
