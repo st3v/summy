@@ -1,6 +1,6 @@
 {
     "name": "summy",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Browser extension that summarizes the contents of the current website",
     "scripts": {
         "build": "wasm-pack build --no-typescript --out-dir 'extension/wasm' --target web",
