@@ -4,3 +4,4 @@ extension/wasm
 *.zip
 *.wasm
 dist
+node_modules

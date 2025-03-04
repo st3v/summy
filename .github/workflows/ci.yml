@@ -91,16 +91,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Ensure zip command is available
-        run: |
-          if ! command -v zip &> /dev/null; then
-            echo "Installing zip..."
-            sudo apt-get update
-            sudo apt-get install -y zip
-          else
-            echo "zip command is already available"
-          fi
-
       - name: Package extension
         run: npm run package
 

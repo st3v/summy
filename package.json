@@ -9,8 +9,11 @@
         "test": "wasm-pack test --headless --chrome",
         "test-repeat": "while npm run test; do :; done",
         "release": "npm run build -- --release",
-        "clean": "rm -rf extension/wasm",
-        "package": "./scripts/package-extension.sh",
+        "clean": "rm -rf ./extension/wasm ./dist ./target",
+        "package": "node scripts/package-extension.js",
         "publish": "npm run build release && npm run update-manifest && npm run package"
+    },
+    "devDependencies": {
+        "adm-zip": "^0.5.16"
     }
 }
