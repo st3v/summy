@@ -60,9 +60,6 @@ jobs:
       - name: Build WASM in release mode
         run: npm run release
 
-      - name: Update manifest
-        run: npm run update-manifest
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:

@@ -3,7 +3,6 @@
     "version": "0.0.1",
     "description": "Browser extension that summarizes the contents of the current website",
     "scripts": {
-        "update-manifest": "node scripts/update-manifest.js",
         "build": "wasm-pack build --no-typescript --out-dir 'extension/wasm' --target web",
         "dev": "npm run build -- --dev",
         "test": "wasm-pack test --headless --chrome",
@@ -11,9 +10,11 @@
         "release": "npm run build -- --release",
         "clean": "rm -rf ./extension/wasm ./dist ./target",
         "package": "node scripts/package-extension.js",
-        "publish": "npm run build release && npm run update-manifest && npm run package"
+        "sync-versions": "node scripts/sync-versions.js",
+        "bump-patch": "npm version patch --no-git-tag-version && npm run sync-versions"
     },
     "devDependencies": {
-        "adm-zip": "^0.5.16"
+        "adm-zip": "^0.5.16",
+        "@iarna/toml": "^3.0.0"
     }
 }
