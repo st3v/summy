@@ -67,8 +67,7 @@ async function testLLM() {
     const model = document.getElementById('model').value;
     const apiKey = document.getElementById('api-key').value;
 
-    // Call the test_llm function from the background module
-    const result = await wasm.test_llm(model, apiKey);
+    const result = await wasm.verify_access(model, apiKey);
     responseElement.textContent = result;
   } catch (error) {
     responseElement.textContent = `Error: ${error.message || error}`;

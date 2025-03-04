@@ -6,6 +6,7 @@
         "update-manifest": "node scripts/update-manifest.js",
         "build": "wasm-pack build --no-typescript --out-dir 'extension/wasm' --target web",
         "dev": "npm run build -- --dev",
+        "test": "wasm-pack test --headless --chrome",
         "release": "npm run build -- --release",
         "clean": "rm -rf extension/wasm",
         "package": "./scripts/package.sh",

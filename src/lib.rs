@@ -18,9 +18,9 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub async fn test_llm(model: &str, api_key: &str) -> Result<String, String> {
+pub async fn verify_access(model: &str, api_key: &str) -> Result<String, String> {
     let request = ChatRequest::new(vec![
-        ChatMessage::system("The user wants to test if they can successfuly interact with you. Reply to them in a single sentence confirming that they have access. Do not greet them or address them directly in any other way. Do not mention anything about chatting or talking with them."),
+        ChatMessage::system("Always reply with \"Access confirmed\"."),
 		ChatMessage::user("Is this working?"),
 	]);
 
@@ -30,12 +30,19 @@ pub async fn test_llm(model: &str, api_key: &str) -> Result<String, String> {
         Ok(resp) => {
             match resp.content_text_as_str() {
                 Some(text) => {
-                    Ok(text.to_string())
+                    Ok(text.trim().to_string())
                 },
-                _ => Err("No answer".to_string()),
+                _ => {
+                    let msg = "Access worked but the model did not answer.";
+                    log(&format!("Error verifying LLM access: {:?}", msg));
+                    Err(msg.to_string())
+                }
             }
         },
-        Err(_) => Err("Could not access the model. Please verify model name and API key.".to_string()),
+        Err(err) => {
+            log(&format!("Error verifying LLM access: {:?}", err));
+            Err("Could not access LLM. Please verify model name and API key.".to_string())
+        }
     }
 }
 
@@ -59,7 +66,7 @@ pub async fn summarize(html: &str, model: &str, api_key: &str) -> Result<String,
         Ok(resp) => {
             match resp.content_text_as_str() {
                 Some(text) => {
-                    Ok(text.to_string())
+                    Ok(text.trim().to_string())
                 },
                 _ => Err(JsError::new("No answer")),
             }
@@ -115,7 +122,7 @@ pub async fn answer(question: &str, html: &str, model: &str, api_key: &str) -> R
             match resp.content_text_as_str() {
                 Some(text) => {
                     log(&format!("Answer: {}", text));
-                    Ok(text.to_string())
+                    Ok(text.trim().to_string())
                 },
                 None => {
                     log("No answer");
@@ -384,3 +391,6 @@ static SUMMARIZE_JSON_SCHEMA: LazyLock<serde_json::Value> = LazyLock::new(|| {
         ]
     })
 });
+
+#[cfg(test)]
+mod test;
