@@ -1,0 +1,141 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Setup ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+      - name: Rust linting
+        run: cargo clippy -- -D warnings
+
+      - name: Run tests
+        run: npm run test
+        env:
+          SUMMY_TEST_MODEL: ${{ secrets.SUMMY_TEST_MODEL }}
+          SUMMY_TEST_API_KEY: ${{ secrets.SUMMY_TEST_API_KEY }}
+
+      - name: Clean WASM directory
+        run: npm run clean
+
+      - name: Build WASM in release mode
+        run: npm run release
+
+      - name: Update manifest
+        run: npm run update-manifest
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-artifacts
+          path: ./extension/wasm/
+          retention-days: 7
+
+  package-extension:
+    name: Package Chrome Extension
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-artifacts
+          path: ./extension/wasm/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Ensure zip command is available
+        run: |
+          if ! command -v zip &> /dev/null; then
+            echo "Installing zip..."
+            sudo apt-get update
+            sudo apt-get install -y zip
+          else
+            echo "zip command is already available"
+          fi
+
+      - name: Package extension
+        run: npm run package
+
+      - name: Upload packaged extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: summy-extension
+          path: ./dist/summy.zip
+          retention-days: 7
+
+  release:
+    name: Create Release
+    needs: package-extension
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download packaged extension
+        uses: actions/download-artifact@v4
+        with:
+          name: summy-extension
+          path: ./
+
+      - name: Get version
+        id: get_version
+        run: echo "version=$(grep '^version' Cargo.toml | head -1 | awk -F '"' '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./summy.zip
+          tag_name: v${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true

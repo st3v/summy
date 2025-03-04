@@ -2,3 +2,5 @@
 target
 extension/wasm
 *.zip
+*.wasm
+dist
