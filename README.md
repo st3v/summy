@@ -1,5 +1,7 @@
 # Summy
 
+[![CI/CD Pipeline](https://github.com/st3v/summy/actions/workflows/ci.yml/badge.svg)](https://github.com/st3v/summy/actions/workflows/ci.yml)
+
 Summy is a Chrome extension that uses generative AI to provide quick, insightful summaries of web pages.
 
 Upon user request, Summy extracts the main content from a given webpage and uses an LLM of choice to generate a concise summary along with relevant context.
