@@ -1,8 +1,13 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import TOML from '@iarna/toml';
+import { createRequire } from 'module';
 
-const fs = require('fs');
-const path = require('path');
-const TOML = require('@iarna/toml');
+const __dirname = import.meta.dirname;
+
+// We need createRequire to import JSON files
+const require = createRequire(import.meta.url);
 
 // Read package.json (source of truth for version)
 const packageJson = require('../package.json');

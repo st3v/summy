@@ -1,16 +1,15 @@
 #!/usr/bin/env node
-
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const AdmZip = require('adm-zip');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import AdmZip from 'adm-zip';
 
 // Script to package the Summy extension for publishing
 console.log("Packaging Summy extension for publishing...");
 
 // Define absolute paths
-const SCRIPT_DIR = __dirname;
-const PROJECT_ROOT = path.dirname(SCRIPT_DIR);
+const __dirname = import.meta.dirname;
+const PROJECT_ROOT = path.dirname(__dirname);
 const OUTPUT_DIR = path.join(PROJECT_ROOT, 'dist');
 
 // Create output directory if it doesn't exist
