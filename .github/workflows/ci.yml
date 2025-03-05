@@ -46,8 +46,8 @@ jobs:
       - name: Rust linting
         run: cargo clippy -- -D warnings
 
-      - name: Run tests
-        run: npm run test
+      - name: Run unit tests
+        run: npm run test:unit
         env:
           SUMMY_TEST_MODEL: ${{ secrets.SUMMY_TEST_MODEL }}
           SUMMY_TEST_API_KEY: ${{ secrets.SUMMY_TEST_API_KEY }}
@@ -57,6 +57,12 @@ jobs:
 
       - name: Build WASM in release mode
         run: npm run release
+
+      - name: Run e2e tests
+        run: npm run test:e2e
+        env:
+          SUMMY_TEST_MODEL: ${{ secrets.SUMMY_TEST_MODEL }}
+          SUMMY_TEST_API_KEY: ${{ secrets.SUMMY_TEST_API_KEY }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
