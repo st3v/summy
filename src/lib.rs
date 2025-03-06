@@ -1,11 +1,10 @@
-use dom_content_extraction::{get_content, scraper::Html};
 use genai::{
     adapter::AdapterKind,
     chat::{ChatMessage, ChatOptions, ChatRequest, ChatResponseFormat, JsonSpec},
     resolver::{AuthData, AuthResolver},
     Client, ModelIden,
 };
-use std::sync::LazyLock;
+use std::{io::Cursor, sync::LazyLock};
 use wasm_bindgen::prelude::*;
 
 mod util;
@@ -133,8 +132,20 @@ pub async fn answer(
 }
 
 fn extract_text(html: &str) -> Result<String, anyhow::Error> {
-    let document = Html::parse_document(html);
-    get_content(&document).map_err(Into::into)
+    // The url is not important for our purposes, we just use a dummy
+    let url = url::Url::parse("http://example.com")?;
+
+    // Get the DOM from the HTML
+    let dom = match readability::extractor::get_dom(&mut Cursor::new(html)) {
+        Ok(dom) => dom,
+        Err(err) => return Err(anyhow::anyhow!("Error parsing HTML: {:?}", err)),
+    };
+
+    // Extract the text from the DOM
+    match readability::extractor::extract(dom, &url) {
+        Ok(product) => Ok(product.text),
+        Err(err) => Err(anyhow::anyhow!("Error extracting text: {:?}", err)),
+    }
 }
 
 fn client(api_key: &str) -> Client {

@@ -73,9 +73,14 @@ fn extract_text_empty() {
 
 #[wasm_bindgen_test]
 fn extract_text_invalid_html() {
-    let result = crate::extract_text("<html><body><p>Test</p>");
+    let result = crate::extract_text("<html><body><p>This is a Test</p>");
     assert!(result.is_ok(), "Expected Ok, got {:?}", result);
-    assert_eq!(result.unwrap(), "Test");
+    let got = result.unwrap();
+    assert!(
+        got.contains("This is a Test"),
+        "Expected 'This is a Test', got {:?}",
+        got
+    );
 }
 
 #[wasm_bindgen_test]
@@ -123,7 +128,10 @@ fn extract_text_no_html() {
     let result = crate::extract_text(html);
 
     assert!(result.is_ok(), "Expected Ok, got {:?}", result);
-    assert_eq!(result.unwrap(), "");
+    let got = result.unwrap();
+    assert!(got.contains("This is the main article content."));
+    assert!(got.contains("It has multiple paragraphs and should be extracted."));
+    assert!(got.contains("This is another paragraph with important information."));
 }
 
 #[wasm_bindgen_test]
