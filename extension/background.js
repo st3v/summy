@@ -44,7 +44,7 @@ function summarizePage(tab, html) {
             return;
         }
 
-        return wasm.summarize(html, model, apiKey).then(function (summary) {
+        return wasm.summarize(getSessionId(tab), html, model, apiKey).then(function (summary) {
             console.log("summarize success:\n", summary);
             displaySummary(tab, summary, null);
         }).catch(function (error) {
@@ -67,66 +67,82 @@ function displaySummary(tab, summary, error) {
         console.debug(`Error sending message to tab ${tab.id}:`, error);
     }
 }
+// User has a follow-up question or comment
+function followUp(tab, question) {
+    // Get API key and model from storage
+    return chrome.storage.sync.get({[MODEL_KEY]: DEFAULT_MODEL, [API_KEY_KEY]: ''})
+        .then(items => {
+            const model = items[MODEL_KEY];
+            const apiKey = items[API_KEY_KEY];
 
-// Process custom questions using promise syntax
-function askQuestion(question, html, apiKey, model) {
-    return wasm.answer(question, html, model, apiKey)
-        .then(result => {
-            return {
-                success: true,
-                answer: result
-            };
-        })
-        .catch(error => {
-            console.error("Error processing question:", error);
-            return {
-                success: false,
-                error: error.message || "An error occurred while processing your question."
-            };
+            if (!apiKey) {
+                throw new Error("API key is not set. Please set it in the extension options.");
+            }
+
+            return wasm.follow_up(getSessionId(tab), question, model, apiKey);
         });
 }
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     switch (request.msg) {
         case "summy_summarize":
-            chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-                if (tabs.length > 0) {
-                    summarizePage(tabs[0], request.html);
-                }
-            });
-            // acknowledge the message
-            sendResponse({received: true});
-            // return true to keep the message channel open
-            return true;
-        case "summy_answer":
-            // Get API key and model from storage
-            chrome.storage.sync.get({[MODEL_KEY]: DEFAULT_MODEL, [API_KEY_KEY]: ''}, function(items) {
-                const model = items[MODEL_KEY];
-                const apiKey = items[API_KEY_KEY];
+            try {
+                getCurrentTab(tab => {
+                    if (tab) {
+                        summarizePage(tab, request.html);
+                    }
+                });
 
-                if (!apiKey) {
+                sendResponse({success: true});
+            } catch (error) {
+                console.error("Error processing summarize message:", error);
+                sendResponse({success: false});
+            }
+            break;
+        case "summy_answer":
+            getCurrentTab(tab => {
+                followUp(tab, request.question).then(answer => {
+                    console.log("Follow-up:", answer);
+                    sendResponse({
+                        success: true,
+                        answer: answer
+                    });
+                }).catch(error => {
+                    console.error("Error processing follow-up question:", error);
                     sendResponse({
                         success: false,
-                        error: "API key is not set. Please set it in the extension options."
+                        error: error
                     });
-                    return;
-                }
-
-                // Process the custom question using the WASM function
-                askQuestion(request.question, request.html, apiKey, model)
-                    .then(result => {
-                        sendResponse(result);
-                    })
-                    .catch(error => {
-                        console.error("Error processing custom question:", error);
-                        sendResponse({
-                            success: false,
-                            error: "Failed to process the question. Please try again."
-                        });
-                    });
+                });
             });
-
-            // Return true to indicate we'll respond asynchronously
-            return true;
+            break;
+        case "summy_cleanup":
+            try {
+                getCurrentTab(tab => {
+                    wasm.cleanup(getSessionId(tab));
+                });
+                sendResponse({success: true});
+            } catch (error) {
+                console.error("Error cleaning up session:", error);
+                sendResponse({success: false, error: error.message});
+            }
+            break;
     }
+
+    // Return true to indicate we will respond asynchronously
+    return true;
 });
+
+function getCurrentTab(callback) {
+    let queryOptions = { active: true, lastFocusedWindow: true };
+    chrome.tabs.query(queryOptions, ([tab]) => {
+        if (chrome.runtime.lastError) throw new Error(chrome.runtime.lastError);
+        callback(tab);
+    });
+}
+
+// Get the session ID for a tab
+function getSessionId(tab) {
+    // use tab ID as session ID
+    return String(tab.id);
+}

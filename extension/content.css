@@ -434,6 +434,7 @@
 .settings-button {
   right: 44px;
   font-size: 22px;
+  align-items: anchor-center;
 }
 
 .close-button:hover, .settings-button:hover {

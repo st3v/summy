@@ -302,7 +302,7 @@ export async function readQuestion(page, idx) {
  * @returns {Promise<void>}
  */
 export async function askQuestion(page) {
-    const question = 'What is the main topic of this page?';
+    const question = 'What is this about?';
 
     // Submit question
     await page.evaluate(({question}) => {
@@ -336,7 +336,7 @@ export async function askQuestion(page) {
         const shadow = root.shadowRoot;
         return shadow.querySelector('.content-text').textContent;
     });
-    expect(customAnswer).toBeTruthy();
+    expect(customAnswer).toContain('example');
 }
 
 /**

@@ -31,7 +31,7 @@ function createSummyView(css) {
     chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
         if (request.msg === "summy_tldr") {
             // acknowledge the message
-            sendResponse({received: true});
+            sendResponse({success: true});
 
             // Remove any existing elements and add the style
             shadow.innerHTML = "";
@@ -46,6 +46,7 @@ function createSummyView(css) {
             } else {
                 // parse the result and display summary
                 let data = JSON.parse(request.result);
+
                 div.appendChild(createStressScore(data.stress_score, data.emoji_outline));
                 div.appendChild(createContent(data.category, data.summary, data.emoji_outline));
                 div.appendChild(createQuestions(data.questions, data.answers, div));
@@ -78,6 +79,9 @@ function createSummyView(css) {
                 setTimeout(() => {
                     // Remove everything from the shadow root
                     shadow.innerHTML = "";
+
+                    // Clean up the session
+                    cleanupSession();
 
                     // Show the button
                     showSummyButton();
@@ -151,7 +155,7 @@ function createSummyButton(css) {
             } else {
                 container.classList.add('hidden');
             }
-            sendResponse({received: true});
+            sendResponse({success: true});
         }
         return true;
     });
@@ -356,18 +360,15 @@ function createQuestions(questions, answers, parent) {
         textView.innerText = "Getting answer...";
 
         try {
-            // Get the entire DOM as string to use as context for the question
-            const domString = document.documentElement.outerHTML;
-
             // Send message to background script
             chrome.runtime.sendMessage(
                 {
                     msg: "summy_answer",
-                    question: question,
-                    html: domString
+                    question: question
                 },
                 (response) => {
-                    console.log("Custom question response:", response);
+                    console.log("Custom question response:", JSON.stringify(response));
+
                     // Reset button state
                     button.disabled = false;
                     button.innerHTML = "Ask";
@@ -457,3 +458,12 @@ function createQuestions(questions, answers, parent) {
 
     return container;
 }
+
+// Session cleanup function
+function cleanupSession() {
+    // send cleanup message to background script
+    chrome.runtime.sendMessage({msg: "summy_cleanup"});
+}
+
+// Cleanup whenever the page is reloaded or closed
+window.addEventListener('beforeunload', cleanupSession);

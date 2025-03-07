@@ -13,6 +13,8 @@ readability = { git = "https://github.com/lucifer9/readability.git" }
 anyhow = "1.0.97"
 url = "2.4"
 serde_json = "1.0.140"
+arraydeque = "0.5.1"
+lru = "0.13"
 
 [dependencies.console_error_panic_hook]
 version = "0.1.7"
