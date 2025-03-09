@@ -3,7 +3,7 @@
   "name": "Summy",
   "short_name": "Summy",
   "description": "Summarize the contents of the current website",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "@st3v",
   "minimum_chrome_version": "110",
   "offline_enabled": false,
